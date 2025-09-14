@@ -1,0 +1,154 @@
+/* Layout */
+.dashboard-wrapper {
+  display: flex;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  height: 100vh;
+  background-color: #f0f4f8;
+  overflow-y: auto;
+}
+
+.dashboard-wrapper.dark {
+  background-color: #1a1a2e;
+  color: #f0f4f8;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  background-color: #2b2d42;
+  color: #ffffff;
+  padding: 20px;
+  flex-shrink: 0;
+}
+
+.sidebar h2 {
+  font-size: 1.5rem;
+  margin-bottom: 30px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin: 15px 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: 0.2s;
+}
+
+.sidebar li:hover {
+  color: #8ac926;
+}
+
+/* Main Content */
+.dashboard-main {
+  flex: 1;
+  padding: 30px;
+}
+
+/* Sections */
+.tasks-section, .settings-section, .help-section, .meeting-section {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.dashboard-wrapper.dark .tasks-section,
+.dashboard-wrapper.dark .settings-section,
+.dashboard-wrapper.dark .help-section,
+.dashboard-wrapper.dark .meeting-section {
+  background-color: #2a2a3c;
+  color: #f0f4f8;
+}
+
+/* Tasks Grid */
+.tasks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+}
+
+.task-card {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+
+.dashboard-wrapper.dark .task-card {
+  background-color: #3a3a50;
+}
+
+.task-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Task Status */
+.status {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+}
+
+.status.todo { background-color: #ffe0b2; color: #ff6f00; }
+.status.in-progress { background-color: #ffd54f; color: #ff6f00; }
+.status.done { background-color: #8ac926; color: #ffffff; }
+
+/* Settings */
+.settings-section label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.settings-section select {
+  margin-left: 10px;
+  padding: 4px 8px;
+}
+
+/* Textarea & Button */
+textarea {
+  width: 100%;
+  min-height: 80px;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  resize: vertical;
+}
+
+button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  background-color: #8ac926;
+  color: #fff;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+button:hover {
+  background-color: #7bb026;
+}
+
+/* Meeting Summary */
+.meeting-summary {
+  white-space: pre-wrap;
+  background-color: #f1f3f5;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.dashboard-wrapper.dark .meeting-summary {
+  background-color: #3a3a50;
+}
