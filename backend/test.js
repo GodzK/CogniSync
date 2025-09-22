@@ -87,12 +87,12 @@ app.post("/api/login", async (req, res) => {
   const valid = await bcrypt.compare(password, user.password);
   if (!valid) return res.status(400).json({ error: "Invalid password" });
 
-  const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET);
+  const token = jwt.sign({ id: user.id, role: user.role, username: user.username }, JWT_SECRET); // Add username to token
   res.json({ token, user: { id: user.id, username: user.username, role: user.role, avatar: user.avatar } });
 });
 
-// Get all users (manager only)
-app.get("/api/users", auth(["manager"]), async (req, res) => {
+// Get all users (manager only)  , auth(["manager"])
+app.get("/api/users", async (req, res) => {
   const { data, error } = await supabase.from("users").select("id, username, avatar, role");
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);

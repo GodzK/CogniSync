@@ -1,31 +1,6 @@
 import React, { useState, useEffect } from "react";
-import "./App.css"; // Paste the CSS from your HTML <style> here (convert SASS to CSS by expanding %flex etc.)
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import {
-  Button,
-  TextField,
-  Select,
-  MenuItem,
-  FormControlLabel,
-  Checkbox,
-  Modal,
-  Box,
-  InputLabel,
-  FormControl,
-} from "@mui/material";
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
 
 function App() {
   const [user, setUser] = useState(null);
@@ -38,7 +13,7 @@ function App() {
   useEffect(() => {
     if (token) {
       const decoded = jwtDecode(token);
-      setUser({ id: decoded.id, role: decoded.role });
+      setUser({ id: decoded.id, role: decoded.role, username: decoded.username });
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     }
   }, [token]);
@@ -74,49 +49,41 @@ function App() {
 
   if (!user) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          flexDirection: "column",
-        }}
-      >
-        <h2>{isLogin ? "Login" : "Register"}</h2>
-        <form onSubmit={isLogin ? handleLogin : handleRegister}>
-          <TextField
-            label="Username"
+      <div className="flex justify-center items-center min-h-screen flex-col bg-background px-4">
+        <h2 className="text-3xl font-bold mb-6">{isLogin ? "Login" : "Register"}</h2>
+        <form onSubmit={isLogin ? handleLogin : handleRegister} className="w-full max-w-md">
+          <input
+            type="text"
+            placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            fullWidth
-            margin="normal"
+            className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
           />
-          <TextField
-            label="Password"
+          <input
             type="password"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            fullWidth
-            margin="normal"
+            className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
           />
           {!isLogin && (
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Role</InputLabel>
-              <Select value={role} onChange={(e) => setRole(e.target.value)}>
-                <MenuItem value="user">User</MenuItem>
-                <MenuItem value="manager">Manager</MenuItem>
-              </Select>
-            </FormControl>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
+            >
+              <option value="user">User</option>
+              <option value="manager">Manager</option>
+            </select>
           )}
-          <Button type="submit" variant="contained" fullWidth>
+          <button type="submit" className="bg-primary text-black p-3 w-full rounded-lg text-lg font-semibold hover:bg-opacity-90">
             {isLogin ? "Login" : "Register"}
-          </Button>
+          </button>
         </form>
-        <Button onClick={() => setIsLogin(!isLogin)}>
+        <button onClick={() => setIsLogin(!isLogin)} className="mt-4 text-primary text-lg underline hover:text-opacity-80">
           {isLogin ? "Switch to Register" : "Switch to Login"}
-        </Button>
-      </Box>
+        </button>
+      </div>
     );
   }
 
@@ -126,15 +93,18 @@ function App() {
 function TaskManager({ user, logout }) {
   const [tasks, setTasks] = useState([]);
   const [schedules, setSchedules] = useState([]);
-  const [usersList, setUsersList] = useState([]); // For all users
+  const [usersList, setUsersList] = useState([]);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [fontSize, setFontSize] = useState(16);
+  const [colorTemplate, setColorTemplate] = useState("default");
   const [newTask, setNewTask] = useState({
     name: "",
     status: "progress",
-    assignedTo: "",
-    isUpcoming: false,
-    dueDate: "",
+    assignedto: "", // Changed to match backend field name
+    isupcoming: false, // Changed to match backend field name
+    duedate: "", // Changed to match backend field name
   });
   const [newSchedule, setNewSchedule] = useState({
     date: "",
@@ -146,28 +116,70 @@ function TaskManager({ user, logout }) {
   });
 
   useEffect(() => {
+    document.documentElement.style.fontSize = `${fontSize}px`;
+  }, [fontSize]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    let primary = "#1976d2";
+    let secondary = "#dc004e";
+    let background = "#fff";
+    let paper = "#fff";
+    switch (colorTemplate) {
+      case "calm1":
+        primary = "#a5d6a7";
+        secondary = "#e0f2f1";
+        background = "#f5f5f5";
+        paper = "#fafafa";
+        break;
+      case "calm2":
+        primary = "#bcaaa4";
+        secondary = "#d7ccc8";
+        background = "#efebe9";
+        paper = "#f5f5f5";
+        break;
+      case "highcontrast":
+        primary = "#000000";
+        secondary = "#ffffff";
+        background = "#ffffff";
+        paper = "#ffffff";
+        break;
+      case "cool":
+        primary = "#81d4fa";
+        secondary = "#b3e5fc";
+        background = "#e3f2fd";
+        paper = "#f0f8ff";
+        break;
+      default:
+        break;
+    }
+    root.style.setProperty("--primary", primary);
+    root.style.setProperty("--secondary", secondary);
+    root.style.setProperty("--background", background);
+    root.style.setProperty("--paper", paper);
+  }, [colorTemplate]);
+
+  useEffect(() => {
     fetchData();
-    // Fetch users for all roles; non-managers get limited data
-    axios.get("/api/users").then((res) => {
-      if (user.role === "manager") {
-        setUsersList(res.data); // Managers get all users
-      } else {
-        // For users, include at least their own data
-        setUsersList(res.data.filter((u) => u.id === user.id));
-      }
-    }).catch((err) => {
-      console.error("Error fetching users:", err.response?.data?.error || err.message);
-    });
   }, [user]);
 
   const fetchData = async () => {
     try {
+      // Fetch users first to ensure usersList is populated before tasks
+      const usersRes = await axios.get("/api/users");
+      const fetchedUsers = user.role === "manager" ? usersRes.data : usersRes.data.filter((u) => u.id === user.id || tasks.some((t) => t.assignedto === u.id));
+      setUsersList(fetchedUsers);
+      console.log("Fetched users:", fetchedUsers); // Debugging
+
       const tasksRes = await axios.get("/api/tasks");
       setTasks(tasksRes.data);
+      console.log("Fetched tasks:", tasksRes.data); // Debugging
+
       const schedRes = await axios.get("/api/schedules");
       setSchedules(schedRes.data);
+      console.log("Fetched schedules:", schedRes.data); // Debugging
     } catch (err) {
-      console.error("Error fetching data:", err.response?.data?.error || err.message);
+      console.error("Error fetching data:", err);
     }
   };
 
@@ -176,7 +188,7 @@ function TaskManager({ user, logout }) {
       await axios.put(`/api/tasks/${id}`, { checked });
       fetchData();
     } catch (err) {
-      console.error("Error updating task:", err.response?.data?.error || err.message);
+      console.error("Error updating task:", err);
     }
   };
 
@@ -185,16 +197,9 @@ function TaskManager({ user, logout }) {
     try {
       await axios.post("/api/tasks", newTask);
       setShowTaskModal(false);
-      setNewTask({
-        name: "",
-        status: "progress",
-        assignedTo: "",
-        isUpcoming: false,
-        dueDate: "",
-      });
+      setNewTask({ name: "", status: "progress", assignedto: "", isupcoming: false, duedate: "" });
       fetchData();
     } catch (err) {
-      console.error("Add task error:", err.response?.data);
       alert(err.response?.data?.error || "Failed to add task");
     }
   };
@@ -205,17 +210,9 @@ function TaskManager({ user, logout }) {
     try {
       await axios.post("/api/schedules", { ...newSchedule, time });
       setShowScheduleModal(false);
-      setNewSchedule({
-        date: "",
-        startTime: "",
-        endTime: "",
-        name: "",
-        members: [],
-        color: "yellow",
-      });
+      setNewSchedule({ date: "", startTime: "", endTime: "", name: "", members: [], color: "yellow" });
       fetchData();
     } catch (err) {
-      console.error("Add schedule error:", err.response?.data);
       alert(err.response?.data?.error || "Failed to add schedule");
     }
   };
@@ -223,343 +220,180 @@ function TaskManager({ user, logout }) {
   const currentTasks = tasks.filter((t) => !t.isupcoming);
   const upcomingTasks = tasks.filter((t) => t.isupcoming);
 
-  return (
-    <div className="task-manager">
-      <div className="left-bar">
-        <div className="upper-part">
-          <div className="actions">
-            <div className="circle"></div>
-            <div className="circle-2"></div>
+  if (showSettings) {
+    return (
+      <div className="min-h-screen bg-background p-6">
+        <button
+          onClick={() => setShowSettings(false)}
+          className="bg-gray-300 text-gray-800 p-3 rounded-lg text-lg mb-6 hover:bg-opacity-90"
+        >
+          Back to Main
+        </button>
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className="w-full md:w-1/3 bg-paper p-6 border-b md:border-r md:border-b-0">
+            <h3 className="text-2xl font-semibold mb-4">User Details</h3>
+            <h2 className="text-3xl mb-2">{user.username}</h2>
+            <h2 className="text-xl">Role: {user.role.charAt(0).toUpperCase() + user.role.slice(1)}</h2>
           </div>
-        </div>
-        <div className="left-content">
-          <ul className="action-list">
-            <li className="item">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                className="feather feather-inbox"
-                viewBox="0 0 24 24"
+          <div className="w-full md:w-2/3">
+            <h2 className="text-3xl font-semibold mb-6">Settings</h2>
+            <div className="mb-6">
+              <label className="block text-lg mb-2">Adjust Font Size</label>
+              <input
+                type="range"
+                min={12}
+                max={24}
+                step={1}
+                value={fontSize}
+                onChange={(e) => setFontSize(Number(e.target.value))}
+                className="w-full accent-primary"
+              />
+              <span className="text-sm text-gray-600 mt-1 block">{fontSize}px</span>
+            </div>
+            <div className="mb-6">
+              <label className="block text-lg mb-2">Color Template</label>
+              <select
+                value={colorTemplate}
+                onChange={(e) => setColorTemplate(e.target.value)}
+                className="border border-gray-300 p-3 w-full rounded-lg text-lg focus:outline-none focus:border-primary"
               >
-                <path d="M22 12h-6l-2 3h-4l-2-3H2" />
-                <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-              </svg>
-              <span>Inbox</span>
-            </li>
-            <li className="item">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="feather feather-star"
-              >
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-              </svg>
-              <span> Today</span>
-            </li>
-            <li className="item">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                className="feather feather-calendar"
-                viewBox="0 0 24 24"
-              >
-                <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-                <path d="M16 2v4M8 2v4m-5 4h18" />
-              </svg>
-              <span>Upcoming</span>
-            </li>
-            <li className="item">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="feather feather-hash"
-              >
-                <line x1="4" y1="9" x2="20" y2="9" />
-                <line x1="4" y1="15" x2="20" y2="15" />
-                <line x1="10" y1="3" x2="8" y2="21" />
-                <line x1="16" y1="3" x2="14" y2="21" />
-              </svg>
-              <span>Important</span>
-            </li>
-            <li className="item">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="feather feather-users"
-              >
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 1 0 0 7.75" />
-              </svg>
-              <span>Meetings</span>
-            </li>
-            <li className="item">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                className="feather feather-trash"
-                viewBox="0 0 24 24"
-              >
-                <path d="M3 6h18m-2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-              </svg>
-              <span>Trash</span>
-            </li>
-          </ul>
-          <ul className="category-list">
-            <li className="item">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="feather feather-users"
-              >
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 1 0 0 7.75" />
-              </svg>
-              <span>Family</span>
-            </li>
-            <li className="item">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                className="feather feather-sun"
-                viewBox="0 0 24 24"
-              >
-                <circle cx="12" cy="12" r="5" />
-                <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-              </svg>
-              <span>Vacation</span>
-            </li>
-            <li className="item">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="feather feather-trending-up"
-              >
-                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-                <polyline points="17 6 23 6 23 12" />
-              </svg>
-              <span>Festival</span>
-            </li>
-            <li className="item">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="feather feather-zap"
-              >
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-              </svg>
-              <span>Concerts</span>
-            </li>
-          </ul>
+                <option value="default">Default</option>
+                <option value="calm1">Calm 1 (Soft Pastels)</option>
+                <option value="calm2">Calm 2 (Earth Tones)</option>
+                <option value="highcontrast">High Contrast</option>
+                <option value="cool">Cool Tones</option>
+              </select>
+            </div>
+            <h3 className="text-2xl font-semibold mb-4">Work Graph</h3>
+            <div className="h-80 w-full bg-gray-200 flex items-center justify-center text-lg text-gray-600">
+              Mock Graph (Coming Soon)
+            </div>
+          </div>
         </div>
       </div>
-      <div className="page-content">
-        <div className="header">
-          Today Tasks{" "}
-          <Button onClick={logout} variant="outlined">
+    );
+  }
+
+  return (
+    <div className="flex flex-col lg:flex-row min-h-screen bg-background">
+      <div className="flex-1 p-6">
+        <div className="flex items-center mb-6">
+          <span className="text-2xl font-semibold">{user.username || "Unknown User"}</span>
+          <button onClick={() => setShowSettings(true)} className="ml-auto p-2 text-gray-600 hover:text-primary">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+            </svg>
+          </button>
+          <button onClick={logout} className="ml-4 bg-red-500 text-white p-3 rounded-lg text-lg hover:bg-opacity-90">
             Logout
-          </Button>
+          </button>
         </div>
-        <div className="content-categories">
-          <div className="label-wrapper">
-            <input className="nav-item" name="nav" type="radio" id="opt-1" />
-            <label className="category" htmlFor="opt-1">
-              All
-            </label>
-          </div>
-          <div className="label-wrapper">
-            <input className="nav-item" name="nav" type="radio" id="opt-2" />
-            <label className="category" htmlFor="opt-2">
-              Important
-            </label>
-          </div>
-          <div className="label-wrapper">
-            <input className="nav-item" name="nav" type="radio" id="opt-3" />
-            <label className="category" htmlFor="opt-3">
-              Notes
-            </label>
-          </div>
-          <div className="label-wrapper">
-            <input className="nav-item" name="nav" type="radio" id="opt-4" />
-            <label className="category" htmlFor="opt-4">
-              Links
-            </label>
-          </div>
-        </div>
-        <div className="tasks-wrapper">
+        <div className="space-y-4">
           {user.role === "manager" && (
-            <Button onClick={() => setShowTaskModal(true)} variant="contained">
+            <button onClick={() => setShowTaskModal(true)} className="bg-blue-600 text-white p-3 rounded-lg text-lg hover:bg-opacity-90 mb-4 w-full sm:w-auto">
               Add Task
-            </Button>
+            </button>
           )}
           {currentTasks.map((task) => (
-            <div className="task" key={task.id}>
+            <div key={task.id} className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 border-b pb-4 text-lg">
               <input
-                className="task-item"
-                name="task"
                 type="checkbox"
                 id={`item-${task.id}`}
                 checked={task.checked}
                 onChange={(e) => handleCheck(task.id, e.target.checked)}
+                className="w-6 h-6 accent-primary"
               />
-              <label htmlFor={`item-${task.id}`}>
-                <span className="label-text">{task.name}</span>
+              <label htmlFor={`item-${task.id}`} className="flex-1 cursor-pointer text-xl">
+                {task.name}
               </label>
-              <span className={`tag ${task.status}`}>
+              <span className={`px-3 py-1 rounded-lg text-white text-lg ${
+                task.status === "progress" ? "bg-blue-500" :
+                task.status === "approved" ? "bg-green-500" :
+                task.status === "review" ? "bg-yellow-500" :
+                "bg-red-500"
+              }`}>
                 {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
               </span>
-              <span>
+              <span className="text-gray-600">
                 Assigned to: {usersList.find((u) => u.id === task.assignedto)?.username || "Unknown User"}
               </span>
-              <span>Due: {task.dueDate || "No due date"}</span>
+              <span className="text-gray-600">Due: {task.duedate || "No due date"}</span>
             </div>
           ))}
-          <div className="header upcoming">Upcoming Tasks</div>
+          <div className="text-2xl font-semibold mt-8 mb-4">Upcoming Tasks</div>
           {upcomingTasks.map((task) => (
-            <div className="task" key={task.id}>
+            <div key={task.id} className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 border-b pb-4 text-lg">
               <input
-                className="task-item"
-                name="task"
                 type="checkbox"
                 id={`item-${task.id}`}
                 checked={task.checked}
                 onChange={(e) => handleCheck(task.id, e.target.checked)}
+                className="w-6 h-6 accent-primary"
               />
-              <label htmlFor={`item-${task.id}`}>
-                <span className="label-text">{task.name}</span>
+              <label htmlFor={`item-${task.id}`} className="flex-1 cursor-pointer text-xl">
+                {task.name}
               </label>
-              <span className={`tag ${task.status}`}>
+              <span className={`px-3 py-1 rounded-lg text-white text-lg ${
+                task.status === "progress" ? "bg-blue-500" :
+                task.status === "approved" ? "bg-green-500" :
+                task.status === "review" ? "bg-yellow-500" :
+                "bg-red-500"
+              }`}>
                 {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
               </span>
-              <span>
+              <span className="text-gray-600">
                 Assigned to: {usersList.find((u) => u.id === task.assignedto)?.username || "Unknown User"}
               </span>
-              <span>Due: {task.dueDate || "No due date"}</span>
+              <span className="text-gray-600">Due: {task.duedate || "No due date"}</span>
             </div>
           ))}
         </div>
       </div>
-      <div className="right-bar">
-        <div className="top-part">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="feather feather-users"
-          >
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-            <path d="M16 3.13a4 4 0 1 0 0 7.75" />
-          </svg>
-          <div className="count">{schedules.length}</div>
-        </div>
-        <div className="header">
-          Schedule{" "}
+      <div className="w-full lg:w-1/3 p-6 bg-paper border-t lg:border-l lg:border-t-0">
+        <div className="flex items-center mb-6">
+          <p className="text-2xl font-semibold">Schedule</p>
           {user.role === "manager" && (
-            <Button
-              onClick={() => setShowScheduleModal(true)}
-              variant="contained"
-            >
+            <button onClick={() => setShowScheduleModal(true)} className="ml-auto bg-primary text-white p-3 rounded-lg text-lg hover:bg-opacity-90">
               Add Schedule
-            </Button>
+            </button>
           )}
         </div>
-        <div className="right-content">
+        <div className="space-y-4">
           {schedules.map((s) => (
-            <div className={`task-box ${s.color}`} key={s.id}>
-              <div className="description-task">
-                <div className="time">{s.time}</div>
-                <div className="task-name">{s.name}</div>
+            <div
+              key={s.id}
+              className={`p-6 border-b text-lg ${
+                s.color === "yellow" ? "bg-yellow-200" :
+                s.color === "blue" ? "bg-blue-200" :
+                s.color === "red" ? "bg-red-200" :
+                "bg-green-200"
+              }`}
+            >
+              <div className="mb-4">
+                <div className="text-gray-600 mb-1">{s.time}</div>
+                <div className="text-xl font-semibold">{s.name}</div>
               </div>
-              <div className="more-button"></div>
-              <div className="members">
+              <div className="flex flex-wrap gap-4">
                 {s.members.map((mId) => {
                   const u = usersList.find((u) => u.id === mId);
                   return u ? (
-                    <div key={u.id} className="member-info">
-                      <img src={u.avatar} alt={u.username} />
+                    <div key={u.id} className="flex items-center">
+                      <img src={u.avatar} alt={u.username} className="w-10 h-10 rounded-full mr-2" />
                       <span>{u.username}</span>
                     </div>
                   ) : (
-                    <div key={mId} className="member-info">
-                      <span>Unknown User</span>
-                    </div>
+                    <div key={mId}>Unknown User</div>
                   );
                 })}
               </div>
@@ -568,179 +402,148 @@ function TaskManager({ user, logout }) {
         </div>
       </div>
 
-      {/* Task Modal (manager only) */}
-      <Modal open={showTaskModal} onClose={() => setShowTaskModal(false)}>
-        <Box sx={style}>
-          <form onSubmit={addTask}>
-            <TextField
-              label="Task Name"
-              value={newTask.name}
-              onChange={(e) => setNewTask({ ...newTask, name: e.target.value })}
-              required
-              fullWidth
-              margin="normal"
-            />
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Status</InputLabel>
-              <Select
-                value={newTask.status}
-                onChange={(e) =>
-                  setNewTask({ ...newTask, status: e.target.value })
-                }
-              >
-                <MenuItem value="progress">Progress</MenuItem>
-                <MenuItem value="approved">Approved</MenuItem>
-                <MenuItem value="review">Review</MenuItem>
-                <MenuItem value="waiting">Waiting</MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Assign To</InputLabel>
-              <Select
-                value={newTask.assignedTo}
-                onChange={(e) =>
-                  setNewTask({ ...newTask, assignedTo: e.target.value })
-                }
+      {showTaskModal && (
+        <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-paper p-6 w-full max-w-md text-black">
+            <form onSubmit={addTask}>
+              <label className="block text-lg mb-2">Task Name</label>
+              <input
+                type="text"
+                value={newTask.name}
+                onChange={(e) => setNewTask({ ...newTask, name: e.target.value })}
                 required
+                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
+              />
+              <label className="block text-lg mb-2">Status</label>
+              <select
+                value={newTask.status}
+                onChange={(e) => setNewTask({ ...newTask, status: e.target.value })}
+                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
               >
-                <MenuItem value="">Assign To</MenuItem>
-                {usersList
-                  .filter((u) => u.role === "user")
-                  .map((u) => (
-                    <MenuItem key={u.id} value={u.id}>
-                      {u.username}
-                    </MenuItem>
-                  ))}
-              </Select>
-            </FormControl>
-            <TextField
-              label="Due Date"
-              type="date"
-              value={newTask.dueDate}
-              onChange={(e) =>
-                setNewTask({ ...newTask, dueDate: e.target.value })
-              }
-              InputLabelProps={{ shrink: true }}
-              fullWidth
-              margin="normal"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={newTask.isUpcoming}
-                  onChange={(e) =>
-                    setNewTask({ ...newTask, isUpcoming: e.target.checked })
-                  }
+                <option value="progress">Progress</option>
+                <option value="approved">Approved</option>
+                <option value="review">Review</option>
+                <option value="waiting">Waiting</option>
+              </select>
+              <label className="block text-lg mb-2">Assign To</label>
+              <select
+                value={newTask.assignedto}
+                onChange={(e) => setNewTask({ ...newTask, assignedto: e.target.value })}
+                required
+                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
+              >
+                <option value="">Assign To</option>
+                {usersList.filter((u) => u.role === "user").map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.username}
+                  </option>
+                ))}
+              </select>
+              <label className="block text-lg mb-2">Due Date</label>
+              <input
+                type="date"
+                value={newTask.duedate}
+                onChange={(e) => setNewTask({ ...newTask, duedate: e.target.value })}
+                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
+              />
+              <div className="flex items-center mb-4">
+                <input
+                  type="checkbox"
+                  checked={newTask.isupcoming}
+                  onChange={(e) => setNewTask({ ...newTask, isupcoming: e.target.checked })}
+                  className="w-6 h-6 accent-primary mr-2"
                 />
-              }
-              label="Upcoming"
-            />
-            <Button type="submit" variant="contained">
-              Add
-            </Button>
-            <Button onClick={() => setShowTaskModal(false)} variant="outlined">
-              Cancel
-            </Button>
-          </form>
-        </Box>
-      </Modal>
+                <label className="text-lg">Upcoming</label>
+              </div>
+              <div className="flex space-x-4">
+                <button type="submit" className="bg-primary text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1">
+                  Add
+                </button>
+                <button onClick={() => setShowTaskModal(false)} className="bg-gray-500 text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
-      {/* Schedule Modal (manager only) */}
-      <Modal
-        open={showScheduleModal}
-        onClose={() => setShowScheduleModal(false)}
-      >
-        <Box sx={style}>
-          <form onSubmit={addSchedule}>
-            <TextField
-              label="Date"
-              type="date"
-              value={newSchedule.date}
-              onChange={(e) =>
-                setNewSchedule({ ...newSchedule, date: e.target.value })
-              }
-              InputLabelProps={{ shrink: true }}
-              required
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Start Time"
-              type="time"
-              value={newSchedule.startTime}
-              onChange={(e) =>
-                setNewSchedule({ ...newSchedule, startTime: e.target.value })
-              }
-              InputLabelProps={{ shrink: true }}
-              required
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="End Time"
-              type="time"
-              value={newSchedule.endTime}
-              onChange={(e) =>
-                setNewSchedule({ ...newSchedule, endTime: e.target.value })
-              }
-              InputLabelProps={{ shrink: true }}
-              required
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              label="Schedule Name"
-              value={newSchedule.name}
-              onChange={(e) =>
-                setNewSchedule({ ...newSchedule, name: e.target.value })
-              }
-              required
-              fullWidth
-              margin="normal"
-            />
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Members</InputLabel>
-              <Select
+      {showScheduleModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-paper p-6 w-full max-w-md">
+            <form onSubmit={addSchedule}>
+              <label className="block text-lg mb-2">Date</label>
+              <input
+                type="date"
+                value={newSchedule.date}
+                onChange={(e) => setNewSchedule({ ...newSchedule, date: e.target.value })}
+                required
+                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
+              />
+              <label className="block text-lg mb-2">Start Time</label>
+              <input
+                type="time"
+                value={newSchedule.startTime}
+                onChange={(e) => setNewSchedule({ ...newSchedule, startTime: e.target.value })}
+                required
+                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
+              />
+              <label className="block text-lg mb-2">End Time</label>
+              <input
+                type="time"
+                value={newSchedule.endTime}
+                onChange={(e) => setNewSchedule({ ...newSchedule, endTime: e.target.value })}
+                required
+                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
+              />
+              <label className="block text-lg mb-2">Schedule Name</label>
+              <input
+                type="text"
+                value={newSchedule.name}
+                onChange={(e) => setNewSchedule({ ...newSchedule, name: e.target.value })}
+                required
+                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
+              />
+              <label className="block text-lg mb-2">Members</label>
+              <select
                 multiple
                 value={newSchedule.members}
                 onChange={(e) =>
-                  setNewSchedule({ ...newSchedule, members: e.target.value })
+                  setNewSchedule({ ...newSchedule, members: Array.from(e.target.selectedOptions, (option) => option.value) })
                 }
+                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
               >
                 {usersList.map((u) => (
-                  <MenuItem key={u.id} value={u.id}>
+                  <option key={u.id} value={u.id}>
                     {u.username}
-                  </MenuItem>
+                  </option>
                 ))}
-              </Select>
-            </FormControl>
-            <FormControl fullWidth margin="normal">
-              <InputLabel>Color</InputLabel>
-              <Select
+              </select>
+              <label className="block text-lg mb-2">Color</label>
+              <select
                 value={newSchedule.color}
-                onChange={(e) =>
-                  setNewSchedule({ ...newSchedule, color: e.target.value })
-                }
+                onChange={(e) => setNewSchedule({ ...newSchedule, color: e.target.value })}
+                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
               >
-                <MenuItem value="yellow">Yellow</MenuItem>
-                <MenuItem value="blue">Blue</MenuItem>
-                <MenuItem value="red">Red</MenuItem>
-                <MenuItem value="green">Green</MenuItem>
-              </Select>
-            </FormControl>
-            <Button type="submit" variant="contained">
-              Add
-            </Button>
-            <Button
-              onClick={() => setShowScheduleModal(false)}
-              variant="outlined"
-            >
-              Cancel
-            </Button>
-          </form>
-        </Box>
-      </Modal>
+                <option value="yellow">Yellow</option>
+                <option value="blue">Blue</option>
+                <option value="red">Red</option>
+                <option value="green">Green</option>
+              </select>
+              <div className="flex space-x-4">
+                <button type="submit" className="bg-primary text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1">
+                  Add
+                </button>
+                <button onClick={() => setShowScheduleModal(false)} className="bg-gray-500 text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1">
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
 export default App;

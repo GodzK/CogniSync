@@ -1,8 +1,19 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  theme: {
+    extend: {
+      colors: {
+        primary: 'var(--primary)',
+        secondary: 'var(--secondary)',
+        background: 'var(--background)',
+        paper: 'var(--paper)',
+      },
+    },
+  },
   server: {
    proxy: {
       '/api': {
@@ -11,5 +22,5 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, '/api'),
       },},
   },
-  plugins: [react()],
+  plugins: [react(),tailwindcss(),],
 })
