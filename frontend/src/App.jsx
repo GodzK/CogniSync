@@ -126,7 +126,7 @@ function App() {
 function TaskManager({ user, logout }) {
   const [tasks, setTasks] = useState([]);
   const [schedules, setSchedules] = useState([]);
-  const [usersList, setUsersList] = useState([]); // For managers
+  const [usersList, setUsersList] = useState([]); // For all users
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [newTask, setNewTask] = useState({
@@ -147,21 +147,37 @@ function TaskManager({ user, logout }) {
 
   useEffect(() => {
     fetchData();
-    if (user.role === "manager") {
-      axios.get("/api/users").then((res) => setUsersList(res.data));
-    }
+    // Fetch users for all roles; non-managers get limited data
+    axios.get("/api/users").then((res) => {
+      if (user.role === "manager") {
+        setUsersList(res.data); // Managers get all users
+      } else {
+        // For users, include at least their own data
+        setUsersList(res.data.filter((u) => u.id === user.id));
+      }
+    }).catch((err) => {
+      console.error("Error fetching users:", err.response?.data?.error || err.message);
+    });
   }, [user]);
 
   const fetchData = async () => {
-    const tasksRes = await axios.get("/api/tasks");
-    setTasks(tasksRes.data);
-    const schedRes = await axios.get("/api/schedules");
-    setSchedules(schedRes.data);
+    try {
+      const tasksRes = await axios.get("/api/tasks");
+      setTasks(tasksRes.data);
+      const schedRes = await axios.get("/api/schedules");
+      setSchedules(schedRes.data);
+    } catch (err) {
+      console.error("Error fetching data:", err.response?.data?.error || err.message);
+    }
   };
 
   const handleCheck = async (id, checked) => {
-    await axios.put(`/api/tasks/${id}`, { checked });
-    fetchData();
+    try {
+      await axios.put(`/api/tasks/${id}`, { checked });
+      fetchData();
+    } catch (err) {
+      console.error("Error updating task:", err.response?.data?.error || err.message);
+    }
   };
 
   const addTask = async (e) => {
@@ -186,21 +202,26 @@ function TaskManager({ user, logout }) {
   const addSchedule = async (e) => {
     e.preventDefault();
     const time = `${newSchedule.date} ${newSchedule.startTime} - ${newSchedule.endTime}`;
-    await axios.post("/api/schedules", { ...newSchedule, time });
-    setShowScheduleModal(false);
-    setNewSchedule({
-      date: "",
-      startTime: "",
-      endTime: "",
-      name: "",
-      members: [],
-      color: "yellow",
-    });
-    fetchData();
+    try {
+      await axios.post("/api/schedules", { ...newSchedule, time });
+      setShowScheduleModal(false);
+      setNewSchedule({
+        date: "",
+        startTime: "",
+        endTime: "",
+        name: "",
+        members: [],
+        color: "yellow",
+      });
+      fetchData();
+    } catch (err) {
+      console.error("Add schedule error:", err.response?.data);
+      alert(err.response?.data?.error || "Failed to add schedule");
+    }
   };
 
-  const currentTasks = tasks.filter((t) => !t.isUpcoming);
-  const upcomingTasks = tasks.filter((t) => t.isUpcoming);
+  const currentTasks = tasks.filter((t) => !t.isupcoming);
+  const upcomingTasks = tasks.filter((t) => t.isupcoming);
 
   return (
     <div className="task-manager">
@@ -302,7 +323,7 @@ function TaskManager({ user, logout }) {
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                 <circle cx="9" cy="7" r="4" />
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                <path d="M16 3.13a4 4 0 1 0 0 7.75" />
               </svg>
               <span>Meetings</span>
             </li>
@@ -341,7 +362,7 @@ function TaskManager({ user, logout }) {
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                 <circle cx="9" cy="7" r="4" />
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                <path d="M16 3.13a4 4 0 1 0 0 7.75" />
               </svg>
               <span>Family</span>
             </li>
@@ -409,31 +430,29 @@ function TaskManager({ user, logout }) {
           </Button>
         </div>
         <div className="content-categories">
-          <div className="content-categories">
-            <div className="label-wrapper">
-              <input className="nav-item" name="nav" type="radio" id="opt-1" />
-              <label className="category" htmlFor="opt-1">
-                All
-              </label>
-            </div>
-            <div className="label-wrapper">
-              <input className="nav-item" name="nav" type="radio" id="opt-2" />
-              <label className="category" htmlFor="opt-2">
-                Important
-              </label>
-            </div>
-            <div className="label-wrapper">
-              <input className="nav-item" name="nav" type="radio" id="opt-3" />
-              <label className="category" htmlFor="opt-3">
-                Notes
-              </label>
-            </div>
-            <div className="label-wrapper">
-              <input className="nav-item" name="nav" type="radio" id="opt-4" />
-              <label className="category" htmlFor="opt-4">
-                Links
-              </label>
-            </div>
+          <div className="label-wrapper">
+            <input className="nav-item" name="nav" type="radio" id="opt-1" />
+            <label className="category" htmlFor="opt-1">
+              All
+            </label>
+          </div>
+          <div className="label-wrapper">
+            <input className="nav-item" name="nav" type="radio" id="opt-2" />
+            <label className="category" htmlFor="opt-2">
+              Important
+            </label>
+          </div>
+          <div className="label-wrapper">
+            <input className="nav-item" name="nav" type="radio" id="opt-3" />
+            <label className="category" htmlFor="opt-3">
+              Notes
+            </label>
+          </div>
+          <div className="label-wrapper">
+            <input className="nav-item" name="nav" type="radio" id="opt-4" />
+            <label className="category" htmlFor="opt-4">
+              Links
+            </label>
           </div>
         </div>
         <div className="tasks-wrapper">
@@ -458,13 +477,10 @@ function TaskManager({ user, logout }) {
               <span className={`tag ${task.status}`}>
                 {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
               </span>
-              {user.role === "manager" && (
-                <span>
-                  Assigned to:{" "}
-                  {usersList.find((u) => u.id === task.assignedTo)?.username}
-                </span>
-              )}
-              <span>Due: {task.dueDate}</span>
+              <span>
+                Assigned to: {usersList.find((u) => u.id === task.assignedto)?.username || "Unknown User"}
+              </span>
+              <span>Due: {task.dueDate || "No due date"}</span>
             </div>
           ))}
           <div className="header upcoming">Upcoming Tasks</div>
@@ -484,13 +500,10 @@ function TaskManager({ user, logout }) {
               <span className={`tag ${task.status}`}>
                 {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
               </span>
-              {user.role === "manager" && (
-                <span>
-                  Assigned to:{" "}
-                  {usersList.find((u) => u.id === task.assignedTo)?.username}
-                </span>
-              )}
-              <span>Due: {task.dueDate}</span>
+              <span>
+                Assigned to: {usersList.find((u) => u.id === task.assignedto)?.username || "Unknown User"}
+              </span>
+              <span>Due: {task.dueDate || "No due date"}</span>
             </div>
           ))}
         </div>
@@ -539,8 +552,15 @@ function TaskManager({ user, logout }) {
                 {s.members.map((mId) => {
                   const u = usersList.find((u) => u.id === mId);
                   return u ? (
-                    <img src={u.avatar} alt="member" key={u.id} />
-                  ) : null;
+                    <div key={u.id} className="member-info">
+                      <img src={u.avatar} alt={u.username} />
+                      <span>{u.username}</span>
+                    </div>
+                  ) : (
+                    <div key={mId} className="member-info">
+                      <span>Unknown User</span>
+                    </div>
+                  );
                 })}
               </div>
             </div>
@@ -723,5 +743,4 @@ function TaskManager({ user, logout }) {
     </div>
   );
 }
-
 export default App;
