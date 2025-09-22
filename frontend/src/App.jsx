@@ -7,46 +7,68 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState("");
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [tel, setTel] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("user");
 
-  useEffect(() => {
+useEffect(() => {
     if (token) {
       const decoded = jwtDecode(token);
-      setUser({ id: decoded.id, role: decoded.role, username: decoded.username });
+      setUser({ id: decoded.id, role: decoded.role, username: decoded.username }); // Set basic ก่อน
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      fetchMe(); // Fetch full info
     }
   }, [token]);
-
-  const handleLogin = async (e) => {
+const fetchMe = async () => {
+    try {
+      const res = await axios.get("/api/me");
+      setUser(res.data); // Update ด้วย full info รวม firstname, lastname, tel
+    } catch (err) {
+      console.error("Error fetching user:", err);
+    }
+  };
+ const handleLogin = async (e) => {
     e.preventDefault();
     try {
       const res = await axios.post("/api/login", { username, password });
       localStorage.setItem("token", res.data.token);
       setToken(res.data.token);
-      setUser(res.data.user);
+      setUser(res.data.user); // Set basic info ก่อน
+      fetchMe(); // Fetch full info ทันที
     } catch (err) {
       alert(err.response?.data?.error || "Error");
     }
   };
-
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("/api/register", { username, password, role });
-      alert("Registered. Now login.");
-      setIsLogin(true);
-    } catch (err) {
-      alert(err.response?.data?.error || "Error");
-    }
-  };
-
-  const logout = () => {
+const handleRegister = async (e) => {
+  e.preventDefault();
+  if (!username || !password || !firstname || !lastname || !tel) {
+    alert("Please fill in all required fields: username, password, firstname, lastname, and tel.");
+    return;
+  }
+  if (!["user", "manager"].includes(role)) {
+    alert("Invalid role selected.");
+    return;
+  }
+  // Relaxed phone number validation
+  if (!/^.{1,20}$/.test(tel)) {
+    alert("Phone number must be 1-20 characters.");
+    return;
+  }
+  try {
+    await axios.post("/api/register", { username, password, role, firstname, lastname, tel });
+    alert("Registered. Now login.");
+    setIsLogin(true);
+  } catch (err) {
+    alert(err.response?.data?.error || "Error during registration");
+  }
+};
+const logout = () => {
     localStorage.removeItem("token");
     setToken(null);
     setUser(null);
   };
-
   if (!user) {
     return (
       <div className="flex justify-center items-center min-h-screen flex-col bg-background px-4">
@@ -59,6 +81,7 @@ function App() {
             onChange={(e) => setUsername(e.target.value)}
             className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
           />
+      
           <input
             type="password"
             placeholder="Password"
@@ -67,6 +90,32 @@ function App() {
             className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
           />
           {!isLogin && (
+            <>
+            <input
+              type="text"
+              placeholder="Firstname" 
+              value={firstname}
+              onChange={(e) => setFirstname(e.target.value)}
+              className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
+            />
+            <input
+              type="text"
+              placeholder="Lastname"
+              value={lastname}
+              onChange={(e) => setLastname(e.target.value)}
+              className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
+            />
+            <input
+              type="text"
+              placeholder="Tel"
+              value={tel}
+              onChange={(e) => setTel(e.target.value)}
+              className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
+            />
+            </>
+          )}   
+          {!isLogin && (
+            
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
@@ -76,6 +125,7 @@ function App() {
               <option value="manager">Manager</option>
             </select>
           )}
+           
           <button type="submit" className="bg-primary text-black p-3 w-full rounded-lg text-lg font-semibold hover:bg-opacity-90">
             {isLogin ? "Login" : "Register"}
           </button>
@@ -232,7 +282,11 @@ function TaskManager({ user, logout }) {
         <div className="flex flex-col md:flex-row gap-6">
           <div className="w-full md:w-1/3 bg-paper p-6 border-b md:border-r md:border-b-0">
             <h3 className="text-2xl font-semibold mb-4">User Details</h3>
-            <h2 className="text-3xl mb-2">{user.username}</h2>
+            <h2 className="text-3xl mb-2">UserName : {user.username}</h2>
+            <h2 className="text-3xl mb-2">ชื่อ : {user.firstname}</h2>
+            <h2 className="text-3xl mb-2">นามสกุล : {user.lastname}</h2>
+            <h2 className="text-3xl mb-2">เบอร์โทร : {user.tel}</h2>
+
             <h2 className="text-xl">Role: {user.role.charAt(0).toUpperCase() + user.role.slice(1)}</h2>
           </div>
           <div className="w-full md:w-2/3">
@@ -364,7 +418,7 @@ function TaskManager({ user, logout }) {
         <div className="flex items-center mb-6">
           <p className="text-2xl font-semibold">Schedule</p>
           {user.role === "manager" && (
-            <button onClick={() => setShowScheduleModal(true)} className="ml-auto bg-primary text-white p-3 rounded-lg text-lg hover:bg-opacity-90">
+            <button onClick={() => setShowScheduleModal(true)} className="ml-auto bg-primary text-black p-3 rounded-lg text-lg hover:bg-opacity-90">
               Add Schedule
             </button>
           )}
@@ -456,7 +510,7 @@ function TaskManager({ user, logout }) {
                 <label className="text-lg">Upcoming</label>
               </div>
               <div className="flex space-x-4">
-                <button type="submit" className="bg-primary text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1">
+                <button type="submit" className="bg-black text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1">
                   Add
                 </button>
                 <button onClick={() => setShowTaskModal(false)} className="bg-gray-500 text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1">
@@ -469,7 +523,7 @@ function TaskManager({ user, logout }) {
       )}
 
       {showScheduleModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-paper p-6 w-full max-w-md">
             <form onSubmit={addSchedule}>
               <label className="block text-lg mb-2">Date</label>
@@ -531,7 +585,7 @@ function TaskManager({ user, logout }) {
                 <option value="green">Green</option>
               </select>
               <div className="flex space-x-4">
-                <button type="submit" className="bg-primary text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1">
+                <button type="submit" className="bg-green-500 text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1">
                   Add
                 </button>
                 <button onClick={() => setShowScheduleModal(false)} className="bg-gray-500 text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1">

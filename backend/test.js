@@ -34,20 +34,31 @@ const auth = (roles = []) => {
 };
 
 // ---------------- Routes ----------------
-
 // Register
 app.post("/api/register", async (req, res) => {
-  const { username, password, role } = req.body;
-  
-  // Validate inputs
-  if (!username || !password || !["user", "manager"].includes(role)) {
-    return res.status(400).json({ error: "Invalid data: username, password, and role (user or manager) are required" });
+  const { username, password, role, firstname, lastname, tel } = req.body;
+
+  // Validate required inputs
+  if (!username || !password || !["user", "manager"].includes(role) || !firstname || !lastname || !tel) {
+    return res.status(400).json({ error: "Invalid data: username, password, role, firstname, lastname, and tel are required" });
   }
 
-  // Validate username format (alphanumeric, dots, underscores, 3-30 characters)
+  // Validate username format
   const usernameRegex = /^[a-zA-Z0-9._]{3,30}$/;
   if (!usernameRegex.test(username)) {
     return res.status(400).json({ error: "Invalid username format. Use 3-30 alphanumeric characters, dots, or underscores." });
+  }
+
+  // Validate firstname and lastname
+  const nameRegex = /^[a-zA-Z\s]{1,50}$/;
+  if (!nameRegex.test(firstname) || !nameRegex.test(lastname)) {
+    return res.status(400).json({ error: "Invalid firstname or lastname. Use 1-50 letters or spaces." });
+  }
+
+  // Relaxed phone number validation (e.g., allow any string up to 20 characters)
+  const telRegex = /^.{1,20}$/;
+  if (!telRegex.test(tel)) {
+    return res.status(400).json({ error: "Phone number must be 1-20 characters." });
   }
 
   // Check existing user
@@ -57,8 +68,8 @@ app.post("/api/register", async (req, res) => {
   const hashed = await bcrypt.hash(password, 10);
   const avatar = `https://randomuser.me/api/portraits/${Math.random() > 0.5 ? "men" : "women"}/${Math.floor(Math.random() * 99)}.jpg`;
 
-  // Create user in Supabase auth with a routable domain
-  const email = `${username}@mydomain.com`; // Changed from @example.com
+  // Create user in Supabase auth
+  const email = `${username}@mydomain.com`;
   const { data: authUser, error: authError } = await supabase.auth.signUp({
     email,
     password,
@@ -67,11 +78,12 @@ app.post("/api/register", async (req, res) => {
     return res.status(500).json({ error: `Auth error: ${authError.message}` });
   }
 
-  // Insert into public.users with auth UID
+  // Insert into public.users
   const { error } = await supabase.from("users").insert([
-    { id: authUser.user.id, username, password: hashed, role, avatar }
+    { id: authUser.user.id, username, password: hashed, role, avatar, firstname, lastname, tel },
   ]);
   if (error) {
+    console.error("Supabase insert error:", error);
     return res.status(500).json({ error: `Database error: ${error.message}` });
   }
 
@@ -111,17 +123,17 @@ app.get("/api/tasks", auth(), async (req, res) => {
 
 // Create task (manager only)
 app.post("/api/tasks", auth(["manager"]), async (req, res) => {
-  const { name, status, assignedTo, isUpcoming, dueDate } = req.body;
-  if (!name || !status || !assignedTo) return res.status(400).json({ error: "Invalid data" });
+  const { name, status, assignedto, isUpcoming, dueDate } = req.body;
+  if (!name || !status || !assignedto) return res.status(400).json({ error: "Invalid data" });
   const allowedStatuses = ['approved', 'progress', 'review', 'waiting'];
   if (!allowedStatuses.includes(status)) return res.status(400).json({ error: "Invalid status" });
 
-  // Validate assignedTo is a valid UUID format
+  // Validate assignedto is a valid UUID format
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  if (!uuidRegex.test(assignedTo)) return res.status(400).json({ error: "Invalid assignedTo format (must be UUID)" });
+  if (!uuidRegex.test(assignedto)) return res.status(400).json({ error: "Invalid assignedto format (must be UUID)" });
 
-  // Verify assignedTo exists
-  const { data: user } = await supabase.from("users").select("id").eq("id", assignedTo).single();
+  // Verify assignedto exists
+  const { data: user } = await supabase.from("users").select("id").eq("id", assignedto).single();
   if (!user) return res.status(400).json({ error: "Assigned user does not exist" });
 
   const { error } = await supabase.from("tasks").insert([
@@ -129,7 +141,7 @@ app.post("/api/tasks", auth(["manager"]), async (req, res) => {
       name,
       status,
       checked: false,
-      assignedto: assignedTo,
+      assignedto: assignedto,
       assignedby: req.user.id,
       isupcoming: !!isUpcoming,
       duedate: dueDate
@@ -170,7 +182,13 @@ app.get("/api/schedules", auth(), async (req, res) => {
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
 });
-
+// Get full user info
+app.get("/api/me", auth(), async (req, res) => {
+  const { data, error } = await supabase.from("users").select("id, username, role, avatar, firstname, lastname, tel").eq("id", req.user.id).single();
+  if (error) return res.status(500).json({ error: error.message });
+  if (!data) return res.status(404).json({ error: "User not found" });
+  res.json(data);
+});
 // Create schedule (manager only)
 app.post("/api/schedules", auth(["manager"]), async (req, res) => {
   const { time, name, members, color } = req.body;
