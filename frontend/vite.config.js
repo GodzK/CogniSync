@@ -6,11 +6,12 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   theme: {
     extend: {
-      colors: {
-        primary: 'var(--primary)',
-        secondary: 'var(--secondary)',
-        background: 'var(--background)',
-        paper: 'var(--paper)',
+     colors: {
+        background: "var(--background)",
+        primary: "var(--primary)",
+        secondary: "var(--secondary)",
+        paper: "var(--paper)",
+        "primary-text": "var(--primary-text)",
       },
     },
   },
