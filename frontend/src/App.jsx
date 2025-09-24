@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import axios from "./axios";
 import { jwtDecode } from "jwt-decode";
 
 function App() {
@@ -12,7 +12,7 @@ function App() {
   const [tel, setTel] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("user");
-
+  
   useEffect(() => {
     if (token) {
       const decoded = jwtDecode(token);
@@ -28,7 +28,7 @@ function App() {
 
   const fetchMe = async () => {
     try {
-      const res = await axios.get("/api/me");
+      const res = await axios.get("/me");
       setUser(res.data); // Update ด้วย full info รวม firstname, lastname, tel
     } catch (err) {
       console.error("Error fetching user:", err);
@@ -38,7 +38,7 @@ function App() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("/api/login", { username, password });
+      const res = await axios.post("/login", { username, password });
       localStorage.setItem("token", res.data.token);
       setToken(res.data.token);
       setUser(res.data.user); // Set basic info ก่อน
@@ -66,7 +66,7 @@ function App() {
       return;
     }
     try {
-      await axios.post("/api/register", {
+      await axios.post("/register", {
         username,
         password,
         role,
@@ -253,7 +253,7 @@ function TaskManager({ user, logout }) {
   const fetchData = async () => {
     try {
       // Fetch users first to ensure usersList is populated before tasks
-      const usersRes = await axios.get("/api/users");
+      const usersRes = await axios.get("/users");
       const fetchedUsers =
         user.role === "manager"
           ? usersRes.data
@@ -264,11 +264,11 @@ function TaskManager({ user, logout }) {
       setUsersList(fetchedUsers);
       console.log("Fetched users:", fetchedUsers); // Debugging
 
-      const tasksRes = await axios.get("/api/tasks");
+      const tasksRes = await axios.get("/tasks");
       setTasks(tasksRes.data);
       console.log("Fetched tasks:", tasksRes.data); // Debugging
 
-      const schedRes = await axios.get("/api/schedules");
+      const schedRes = await axios.get("/schedules");
       setSchedules(schedRes.data);
       console.log("Fetched schedules:", schedRes.data); // Debugging
     } catch (err) {
@@ -278,7 +278,7 @@ function TaskManager({ user, logout }) {
 
   const handleCheck = async (id, checked) => {
     try {
-      await axios.put(`/api/tasks/${id}`, { checked });
+      await axios.put(`/tasks/${id}`, { checked });
       fetchData();
     } catch (err) {
       console.error("Error updating task:", err);
@@ -288,7 +288,7 @@ function TaskManager({ user, logout }) {
   const addTask = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("/api/tasks", newTask);
+      await axios.post("/tasks", newTask);
       setShowTaskModal(false);
       setNewTask({
         name: "",
@@ -307,7 +307,7 @@ function TaskManager({ user, logout }) {
     e.preventDefault();
     const time = `${newSchedule.date} ${newSchedule.startTime} - ${newSchedule.endTime}`;
     try {
-      await axios.post("/api/schedules", { ...newSchedule, time });
+      await axios.post("/schedules", { ...newSchedule, time });
       setShowScheduleModal(false);
       setNewSchedule({
         date: "",
