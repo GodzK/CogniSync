@@ -443,7 +443,7 @@ function TaskManager({ user, logout }) {
           </button>
           <button
             onClick={logout}
-            className="ml-4 bg-red-500 text-white p-3 rounded-lg text-lg hover:bg-opacity-90"
+            className="ml-4 bg-red-300 text-white p-3 rounded-lg text-lg hover:bg-opacity-90"
           >
             Logout
           </button>
@@ -451,7 +451,7 @@ function TaskManager({ user, logout }) {
         {user.role === "manager" && (
           <button
             onClick={() => setShowTaskModal(true)}
-            className="bg-blue-600 text-white p-3 rounded-lg text-lg hover:bg-opacity-90 mb-4 w-full sm:w-auto"
+            className="bg-blue-300 text-white p-3 rounded-lg text-lg hover:bg-opacity-90 mb-4 w-full sm:w-auto"
           >
             Add Task
           </button>
@@ -473,11 +473,11 @@ function TaskManager({ user, logout }) {
               id={`item-${task.id}`}
               checked={task.checked}
               onChange={(e) => handleCheck(task.id, e.target.checked)}
-              className="w-6 h-6 accent-[var(--primary)] mt-1"
+              className="w-8 h-16 accent-[var(--primary)] mt-1"
             />
             <label
               htmlFor={`item-${task.id}`}
-              className="flex-1 cursor-pointer text-lg font-semibold leading-snug break-words"
+              className="flex-1 cursor-pointer text-2xl font-semibold leading-snug break-words"
             >
              {task.name}
             </label>
@@ -488,12 +488,12 @@ function TaskManager({ user, logout }) {
             <span
               className={`px-3 py-1 rounded-lg text-white font-medium text-center ${
                 task.status === "progress"
-                  ? "bg-blue-500"
+                  ? "bg-blue-300"
                   : task.status === "approved"
-                  ? "bg-green-500"
+                  ? "bg-green-300"
                   : task.status === "review"
-                  ? "bg-yellow-500"
-                  : "bg-red-500"
+                  ? "bg-yellow-300"
+                  : "bg-red-300"
               }`}
             >
               {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
@@ -502,7 +502,7 @@ function TaskManager({ user, logout }) {
                Assign To :  {usersList.find((u) => u.id === task.assignedto)?.username ||
                 "Unknown User"}
             </span>
-            <span className="whitespace-nowrap text-gray-500">
+            <span className="whitespace-nowrap text-gray-300">
               {task.duedate || "No due date"}
             </span>
           </div>
@@ -515,7 +515,7 @@ function TaskManager({ user, logout }) {
   <h2 className="text-2xl font-bold mb-4">Upcoming Tasks</h2>
 
   {upcomingTasks.length === 0 ? (
-    <div className="bg-white rounded-xl shadow-md p-6 flex items-center justify-center text-gray-500 text-lg italic">
+    <div className="bg-white rounded-xl shadow-md p-6 flex items-center justify-center text-gray-300 text-lg italic">
       No Upcoming Tasks
     </div>
   ) : (
@@ -547,12 +547,12 @@ function TaskManager({ user, logout }) {
             <span
               className={`px-3 py-1 rounded-lg text-white font-medium text-center ${
                 task.status === "progress"
-                  ? "bg-blue-500"
+                  ? "bg-blue-300"
                   : task.status === "approved"
-                  ? "bg-green-500"
+                  ? "bg-green-300"
                   : task.status === "review"
-                  ? "bg-yellow-500"
-                  : "bg-red-500"
+                  ? "bg-yellow-300"
+                  : "bg-red-300"
               }`}
             >
               {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
@@ -561,7 +561,7 @@ function TaskManager({ user, logout }) {
               {usersList.find((u) => u.id === task.assignedto)?.username ||
                 "Unknown User"}
             </span>
-            <span className="whitespace-nowrap text-gray-500">
+            <span className="whitespace-nowrap text-gray-300">
               {task.duedate || "No due date"}
             </span>
           </div>
@@ -580,8 +580,8 @@ function TaskManager({ user, logout }) {
           {user.role === "manager" && (
             <button
               onClick={() => setShowScheduleModal(true)}
-              className="ml-auto bg-primary text-[var(--primary-text)] p-3 rounded-lg text-lg hover:bg-opacity-90"
-            style={{ backgroundColor: "#F5F5DC" , color : "black"}}>
+              className="ml-auto bg-yellow-300 text-[var(--primary-text)] p-3 rounded-lg text-lg hover:bg-opacity-90"
+            style={{ color : "black"}}>
               Add Schedule
             </button>
           )}
@@ -590,15 +590,8 @@ function TaskManager({ user, logout }) {
           {schedules.map((s) => (
             <div
               key={s.id}
-              className={`p-6 border-b text-lg ${
-                s.color === "yellow"
-                  ? "bg-yellow-200"
-                  : s.color === "blue"
-                  ? "bg-blue-200"
-                  : s.color === "red"
-                  ? "bg-red-200"
-                  : "bg-green-200"
-              }`}
+              className={`p-6 border-b text-lg`}
+              style={{backgroundColor:"#F5F5DC"}}
             >
               <div className="mb-4">
                 <div className="text-gray-600 mb-1">{s.time}</div>
@@ -700,7 +693,7 @@ function TaskManager({ user, logout }) {
                 </button>
                 <button
                   onClick={() => setShowTaskModal(false)}
-                  className="bg-gray-500 text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1"
+                  className="bg-gray-300 text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1"
                 >
                   Cancel
                 </button>
@@ -791,13 +784,13 @@ function TaskManager({ user, logout }) {
               <div className="flex space-x-4">
                 <button
                   type="submit"
-                  className="bg-green-500 text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1"
+                  className="bg-green-300 text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1"
                 >
                   Add
                 </button>
                 <button
                   onClick={() => setShowScheduleModal(false)}
-                  className="bg-gray-500 text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1"
+                  className="bg-gray-300 text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1"
                 >
                   Cancel
                 </button>
