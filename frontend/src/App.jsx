@@ -38,6 +38,7 @@ function App() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      console.log("Login CLick");
       const res = await axios.post("/login", { username, password });
       localStorage.setItem("token", res.data.token);
       setToken(res.data.token);
@@ -87,82 +88,123 @@ function App() {
     setUser(null);
   };
 
-  if (!user) {
+if (!user) {
     return (
       <div
         className="flex justify-center items-center min-h-screen flex-col bg-background px-4"
-        style={{ backgroundColor: "var(--background)" }}
+        style={{ backgroundColor: "var(--background)", fontFamily: "Arial, sans-serif" }}
       >
-        <h2 className="text-3xl font-bold mb-6">
+        <h2 className="text-3xl font-bold mb-6" aria-label={isLogin ? "Login form" : "Register form"}>
           {isLogin ? "Login" : "Register"}
         </h2>
         <form
           onSubmit={isLogin ? handleLogin : handleRegister}
-          className="w-full max-w-md"
+          className="w-full max-w-md space-y-4"
+          aria-labelledby={isLogin ? "login-heading" : "register-heading"}
         >
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
-          />
-
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
-          />
+          <div>
+            <label htmlFor="username" className="block text-lg mb-2 font-medium">
+              Username
+            </label>
+            <input
+              id="username"
+              type="text"
+              placeholder="Enter your username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+              aria-required="true"
+            />
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-lg mb-2 font-medium">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+              aria-required="true"
+            />
+          </div>
           {!isLogin && (
             <>
-              <input
-                type="text"
-                placeholder="Firstname"
-                value={firstname}
-                onChange={(e) => setFirstname(e.target.value)}
-                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
-              />
-              <input
-                type="text"
-                placeholder="Lastname"
-                value={lastname}
-                onChange={(e) => setLastname(e.target.value)}
-                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
-              />
-              <input
-                type="text"
-                placeholder="Tel"
-                value={tel}
-                onChange={(e) => setTel(e.target.value)}
-                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
-              />
+              <div>
+                <label htmlFor="firstname" className="block text-lg mb-2 font-medium">
+                  First Name
+                </label>
+                <input
+                  id="firstname"
+                  type="text"
+                  placeholder="Enter your first name"
+                  value={firstname}
+                  onChange={(e) => setFirstname(e.target.value)}
+                  className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                  aria-required="true"
+                />
+              </div>
+              <div>
+                <label htmlFor="lastname" className="block text-lg mb-2 font-medium">
+                  Last Name
+                </label>
+                <input
+                  id="lastname"
+                  type="text"
+                  placeholder="Enter your last name"
+                  value={lastname}
+                  onChange={(e) => setLastname(e.target.value)}
+                  className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                  aria-required="true"
+                />
+              </div>
+              <div>
+                <label htmlFor="tel" className="block text-lg mb-2 font-medium">
+                  Phone Number
+                </label>
+                <input
+                  id="tel"
+                  type="text"
+                  placeholder="Enter your phone number"
+                  value={tel}
+                  onChange={(e) => setTel(e.target.value)}
+                  className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                  aria-required="true"
+                />
+              </div>
+              <div>
+                <label htmlFor="role" className="block text-lg mb-2 font-medium">
+                  Role
+                </label>
+                <select
+                  id="role"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                  aria-required="true"
+                >
+                  <option value="user">User</option>
+                  <option value="manager">Manager</option>
+                </select>
+              </div>
             </>
           )}
-          {!isLogin && (
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
-            >
-              <option value="user">User</option>
-              <option value="manager">Manager</option>
-            </select>
-          )}
-
           <button
             type="submit"
-            className="bg-primary text-[var(--primary-text)] p-3 w-full rounded-lg text-lg font-semibold hover:bg-opacity-90"
+            className="bg-primary text-[var(--primary-text)] p-4 w-full rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary"
+            aria-label={isLogin ? "Submit login" : "Submit registration"}
           >
             {isLogin ? "Login" : "Register"}
           </button>
         </form>
         <button
           onClick={() => setIsLogin(!isLogin)}
-          className="mt-4 text-primary text-lg underline hover:text-opacity-80"
+          className="mt-4 text-primary text-lg underline hover:text-opacity-80 focus:outline-none focus:ring-4 focus:ring-primary"
+          aria-label={isLogin ? "Switch to register" : "Switch to login"}
         >
-          {isLogin ? "Switch to Register" : "Switch to Login"}
+          {isLogin ? "Need to register?" : "Already have an account?"}
         </button>
       </div>
     );
@@ -178,8 +220,8 @@ function TaskManager({ user, logout }) {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [fontSize, setFontSize] = useState(16);
-  const [colorTemplate, setColorTemplate] = useState("theme1");
+  const [fontSize, setFontSize] = useState(18);
+  const [colorTemplate, setColorTemplate] = useState("calmBlue");
   const [newTask, setNewTask] = useState({
     name: "",
     status: "progress",
@@ -202,39 +244,35 @@ function TaskManager({ user, logout }) {
 
   useEffect(() => {
     const root = document.documentElement;
-    let primary = "#1976d2";
-    let secondary = "#dc004e";
-    let background = "#fff";
-    let paper = "#fff";
-    let primaryText = "#000000";
+   let primary = "#4A90E2"; // Soft blue
+    let secondary = "#A3BFFA"; // Lighter blue
+    let background = "#F0F4FF"; // Very light blue
+    let paper = "#F9F9F9"; // Off-white
+    let primaryText = "#1A202C"; // Dark gray for contrast
     switch (colorTemplate) {
-      case "theme1":
-        primary = "#87CEEB";
-        secondary = "#B0E0E6";
-        background = "#F0F8FF";
-        paper = "#FFFACD";
-        primaryText = "#000000";
+      //calm blue
+      case "calmBlue":
+        primary = "#4A90E2";
+        secondary = "#A3BFFA";
+        background = "#F0F4FF";
+        paper = "#F9F9F9";
+        primaryText = "#1A202C";
         break;
-      case "theme2":
-        primary = "#4CAF50";
-        secondary = "#8BC34A";
-        background = "#9EE294";
-        paper = "#FFFFFF";
-        primaryText = "#FFFFFF";
+      case "softGreen":
+        // soft green
+        primary = "#68D391";
+        secondary = "#B2F5EA";
+        background = "#E6FFFA";
+        paper = "#F0FFF4";
+        primaryText = "#1A202C";
         break;
-      case "theme3":
-        primary = "#FF5722";
-        secondary = "#FF9800";
-        background = "#AC7853";
-        paper = "#FFFACD";
-        primaryText = "#FFFFFF";
-        break;
-      case "theme4":
-        primary = "#388E3C";
-        secondary = "#66BB6A";
-        background = "#5A6C5A";
-        paper = "#FFFACD";
-        primaryText = "#FFFFFF";
+        // gentle cream
+      case "gentleCream":
+        primary = "#F6E05E";
+        secondary = "#FEFCBF";
+        background = "#FFFFF0";
+        paper = "#FFF5E6";
+        primaryText = "#1A202C";
         break;
       default:
         break;
@@ -303,7 +341,7 @@ function TaskManager({ user, logout }) {
     }
   };
 
-  const addSchedule = async (e) => {
+   const addSchedule = async (e) => {
     e.preventDefault();
     const time = `${newSchedule.date} ${newSchedule.startTime} - ${newSchedule.endTime}`;
     try {
@@ -318,10 +356,17 @@ function TaskManager({ user, logout }) {
         color: "yellow",
       });
       fetchData();
+      alert("Schedule added successfully!");
     } catch (err) {
-      alert(err.response?.data?.error || "Failed to add schedule");
+      alert(err.response?.data?.error || "Failed to add schedule.");
     }
   };
+   const handleKeyDown = (e, setModal) => {
+    if (e.key === "Escape") {
+      setModal(false);
+    }
+  };
+
 
   const currentTasks = tasks.filter((t) => !t.isupcoming);
   const upcomingTasks = tasks.filter((t) => t.isupcoming);
@@ -329,34 +374,33 @@ function TaskManager({ user, logout }) {
   if (showSettings) {
     return (
       <div
-        className="min-h-screen p-6"
-        style={{ backgroundColor: "var(--background)" }}
+        className="min-h-screen p-8 bg-background"
+        style={{ backgroundColor: "var(--background)", fontFamily: "Arial, sans-serif" }}
       >
-        {/* ปุ่ม Back */}
         <button
           onClick={() => setShowSettings(false)}
-          className="bg-gray-300 text-gray-800 px-5 py-3 rounded-xl text-lg mb-6 shadow hover:bg-opacity-90 transition"
+          className="bg-gray-200 text-gray-800 px-6 py-3 rounded-xl text-lg font-semibold mb-8 hover:bg-gray-300 focus:ring-4 focus:ring-primary"
+          aria-label="Back to main page"
         >
-          Back to Main
+          Back
         </button>
-
-        {/* Layout หลัก */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* User Details */}
-          <div className="col-span-1 bg-[var(--paper)] p-6 rounded-2xl shadow-md">
-            <h3 className="text-2xl font-semibold mb-4">User Details</h3>
-            <div className="space-y-2 text-lg">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="bg-paper p-8 rounded-2xl shadow-md">
+            <h3 className="text-2xl font-semibold mb-4" id="user-details">
+              Your Profile
+            </h3>
+            <div className="space-y-3 text-lg" aria-labelledby="user-details">
               <p>
-                <span className="font-semibold">UserName:</span> {user.username}
+                <span className="font-semibold">Username:</span> {user.username}
               </p>
               <p>
-                <span className="font-semibold">ชื่อ:</span> {user.firstname}
+                <span className="font-semibold">First Name:</span> {user.firstname}
               </p>
               <p>
-                <span className="font-semibold">นามสกุล:</span> {user.lastname}
+                <span className="font-semibold">Last Name:</span> {user.lastname}
               </p>
               <p>
-                <span className="font-semibold">เบอร์โทร:</span> {user.tel}
+                <span className="font-semibold">Phone:</span> {user.tel}
               </p>
               <p className="pt-2 text-xl">
                 <span className="font-semibold">Role:</span>{" "}
@@ -364,47 +408,48 @@ function TaskManager({ user, logout }) {
               </p>
             </div>
           </div>
-
-          {/* Settings */}
-          <div className="col-span-2 bg-[var(--paper)] p-6 rounded-2xl shadow-md">
-            <h2 className="text-3xl font-semibold mb-6">Settings</h2>
-
-            {/* Font Size */}
-            <div className="mb-6">
-              <label className="block text-lg mb-2">Adjust Font Size</label>
+          <div className="col-span-2 bg-paper p-8 rounded-2xl shadow-md">
+            <h2 className="text-3xl font-semibold mb-6" id="settings-heading">
+              Settings
+            </h2>
+            <div className="mb-8">
+              <label htmlFor="font-size" className="block text-lg mb-2 font-medium">
+                Font Size
+              </label>
               <input
+                id="font-size"
                 type="range"
                 min={12}
-                max={24}
+                max={28}
                 step={1}
                 value={fontSize}
                 onChange={(e) => setFontSize(Number(e.target.value))}
-                className="w-full accent-[var(--primary)]"
+                className="w-full h-3 accent-primary"
+                aria-label="Adjust font size"
               />
-              <span className="text-sm text-gray-600 mt-1 block">
+              <span className="text-sm text-gray-600 mt-2 block">
                 {fontSize}px
               </span>
             </div>
-
-            {/* Color Template */}
-            <div className="mb-6">
-              <label className="block text-lg mb-2">Color Template</label>
+            <div className="mb-8">
+              <label htmlFor="color-template" className="block text-lg mb-2 font-medium">
+                Color Theme
+              </label>
               <select
+                id="color-template"
                 value={colorTemplate}
                 onChange={(e) => setColorTemplate(e.target.value)}
-                className="border border-gray-300 p-3 w-full rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition"
+                className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                aria-label="Select color theme"
               >
-                <option value="theme1">Light Blue & Cream</option>
-                <option value="theme2">Green & White</option>
-                <option value="theme3">Dark Orange & Cream</option>
-                <option value="theme4">Dark Green & Cream</option>
+                <option value="calmBlue">Calm Blue</option>
+                <option value="softGreen">Soft Green</option>
+                <option value="gentleCream">Gentle Cream</option>
               </select>
             </div>
-
-            {/* Graph */}
-            <h3 className="text-2xl font-semibold mb-4">Work Graph</h3>
+            <h3 className="text-2xl font-semibold mb-4">Work Overview</h3>
             <div className="h-80 w-full bg-gray-100 rounded-xl flex items-center justify-center text-lg text-gray-600 shadow-inner">
-              Mock Graph (Coming Soon)
+              Chart Coming Soon
             </div>
           </div>
         </div>
@@ -415,27 +460,29 @@ function TaskManager({ user, logout }) {
   return (
     <div
       className="flex flex-col lg:flex-row min-h-screen bg-background"
-      style={{ backgroundColor: "var(--background)" }}
+      style={{ backgroundColor: "var(--background)", fontFamily: "Arial, sans-serif" }}
     >
-      <div className="flex-1 p-6">
-        <div className="flex items-center mb-6">
-          <span className="text-2xl font-semibold">
-            {user.username || "Unknown User"}
+      <div className="flex-1 p-8">
+        <div className="flex items-center mb-8">
+          <span className="text-2xl font-semibold" aria-label={`Welcome, ${user.username}`}>
+            {user.username || "User"}
           </span>
           <button
             onClick={() => setShowSettings(true)}
-            className="ml-auto p-2 text-gray-600 hover:text-primary"
+            className="ml-auto p-3 text-gray-600 hover:text-primary focus:ring-4 focus:ring-primary"
+            aria-label="Open settings"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
+              width="28"
+              height="28"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
             >
               <circle cx="12" cy="12" r="3" />
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
@@ -443,158 +490,157 @@ function TaskManager({ user, logout }) {
           </button>
           <button
             onClick={logout}
-            className="ml-4 bg-red-300 text-white p-3 rounded-lg text-lg hover:bg-opacity-90"
+            className="ml-4 bg-red-300 text-white p-4 rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary"
+            aria-label="Log out"
           >
-            Logout
+            Log Out
           </button>
         </div>
         {user.role === "manager" && (
           <button
             onClick={() => setShowTaskModal(true)}
-            className="bg-blue-300 text-white p-3 rounded-lg text-lg hover:bg-opacity-90 mb-4 w-full sm:w-auto"
+            className="bg-primary text-[var(--primary-text)] p-4 rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary mb-8 w-full sm:w-auto"
+            aria-label="Add a new task"
           >
             Add Task
           </button>
         )}
-       <div className="space-y-8 p-6" style={{ backgroundColor: "#F5F5DC" }}>
-  {/* Current Tasks */}
-  <div>
-    <h2 className="text-2xl font-bold mb-4">Current Tasks</h2>
-    <div className="grid gap-4 sm:grid-rows-2 lg:grid-rows-3">
-      {currentTasks.map((task) => (
-        <div
-          key={task.id}
-          className="bg-white rounded-xl shadow-md p-4 flex flex-col gap-3 hover:shadow-lg transition"
-        >
-          {/* Header: Checkbox + ชื่อ */}
-          <div className="flex items-start gap-3">
-            <input
-              type="checkbox"
-              id={`item-${task.id}`}
-              checked={task.checked}
-              onChange={(e) => handleCheck(task.id, e.target.checked)}
-              className="w-8 h-16 accent-[var(--primary)] mt-1"
-            />
-            <label
-              htmlFor={`item-${task.id}`}
-              className="flex-1 cursor-pointer text-2xl font-semibold leading-snug break-words"
-            >
-             {task.name}
-            </label>
+        <div className="space-y-8">
+          <div>
+            <h2 className="text-2xl font-bold mb-4" id="current-tasks">
+              Current Tasks
+            </h2>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {currentTasks.map((task) => (
+                <div
+                  key={task.id}
+                  className="bg-paper rounded-xl shadow-md p-6 flex flex-col gap-4"
+                >
+                  <div className="flex items-start gap-4">
+                    <input
+                      type="checkbox"
+                      id={`task-${task.id}`}
+                      checked={task.checked}
+                      onChange={(e) => handleCheck(task.id, e.target.checked)}
+                      className="w-8 h-8 accent-primary mt-1"
+                      aria-label={`Mark task ${task.name} as completed`}
+                    />
+                    <label
+                      htmlFor={`task-${task.id}`}
+                      className="flex-1 text-lg font-semibold leading-snug break-words"
+                    >
+                      {task.name}
+                    </label>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3 text-base">
+                    <span
+                      className={`px-3 py-1 rounded-lg text-white font-medium ${
+                        task.status === "progress"
+                          ? "bg-blue-300"
+                          : task.status === "approved"
+                          ? "bg-green-300"
+                          : task.status === "review"
+                          ? "bg-yellow-300"
+                          : "bg-red-300"
+                      }`}
+                      aria-label={`Status: ${task.status}`}
+                    >
+                      {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+                    </span>
+                    <span className="flex-1">
+                      Assigned: {usersList.find((u) => u.id === task.assignedto)?.username || "Unknown"}
+                    </span>
+                    <span className="text-gray-600">
+                      Due: {task.duedate || "None"}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-
-          {/* Status + Details */}
-          <div className="flex flex-wrap items-center gap-2 text-sm text-gray-700">
-            <span
-              className={`px-3 py-1 rounded-lg text-white font-medium text-center ${
-                task.status === "progress"
-                  ? "bg-blue-300"
-                  : task.status === "approved"
-                  ? "bg-green-300"
-                  : task.status === "review"
-                  ? "bg-yellow-300"
-                  : "bg-red-300"
-              }`}
-            >
-              {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
-            </span>
-            <span className="flex-1">
-               Assign To :  {usersList.find((u) => u.id === task.assignedto)?.username ||
-                "Unknown User"}
-            </span>
-            <span className="whitespace-nowrap text-gray-300">
-              {task.duedate || "No due date"}
-            </span>
+          <div>
+            <h2 className="text-2xl font-bold mb-4" id="upcoming-tasks">
+              Upcoming Tasks
+            </h2>
+            {upcomingTasks.length === 0 ? (
+              <div className="bg-paper rounded-xl shadow-md p-6 text-center text-gray-600 text-lg">
+                No Upcoming Tasks
+              </div>
+            ) : (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {upcomingTasks.map((task) => (
+                  <div
+                    key={task.id}
+                    className="bg-paper rounded-xl shadow-md p-6 flex flex-col gap-4"
+                  >
+                    <div className="flex items-start gap-4">
+                      <input
+                        type="checkbox"
+                        id={`task-${task.id}`}
+                        checked={task.checked}
+                        onChange={(e) => handleCheck(task.id, e.target.checked)}
+                        className="w-8 h-8 accent-primary mt-1"
+                        aria-label={`Mark task ${task.name} as completed`}
+                      />
+                      <label
+                        htmlFor={`task-${task.id}`}
+                        className="flex-1 text-lg font-semibold leading-snug break-words"
+                      >
+                        {task.name}
+                      </label>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3 text-base">
+                      <span
+                        className={`px-3 py-1 rounded-lg text-white font-medium ${
+                          task.status === "progress"
+                            ? "bg-blue-300"
+                            : task.status === "approved"
+                            ? "bg-green-300"
+                            : task.status === "review"
+                            ? "bg-yellow-300"
+                            : "bg-red-300"
+                        }`}
+                        aria-label={`Status: ${task.status}`}
+                      >
+                        {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+                      </span>
+                      <span className="flex-1">
+                        Assigned: {usersList.find((u) => u.id === task.assignedto)?.username || "Unknown"}
+                      </span>
+                      <span className="text-gray-600">
+                        Due: {task.duedate || "None"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
-      ))}
-    </div>
-  </div>
-
- <div>
-  <h2 className="text-2xl font-bold mb-4">Upcoming Tasks</h2>
-
-  {upcomingTasks.length === 0 ? (
-    <div className="bg-white rounded-xl shadow-md p-6 flex items-center justify-center text-gray-300 text-lg italic">
-      No Upcoming Tasks
-    </div>
-  ) : (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {upcomingTasks.map((task) => (
-        <div
-          key={task.id}
-          className="bg-white rounded-xl shadow-md p-4 flex flex-col gap-3 hover:shadow-lg transition"
-        >
-          {/* Task Header */}
-          <div className="flex items-start gap-3">
-            <input
-              type="checkbox"
-              id={`item-${task.id}`}
-              checked={task.checked}
-              onChange={(e) => handleCheck(task.id, e.target.checked)}
-              className="w-6 h-6 accent-[var(--primary)] mt-1"
-            />
-            <label
-              htmlFor={`item-${task.id}`}
-              className="flex-1 cursor-pointer text-lg font-semibold leading-snug break-words"
-            >
-              {task.name}
-            </label>
-          </div>
-
-          {/* Task Info */}
-          <div className="flex flex-wrap items-center gap-2 text-sm text-gray-700">
-            <span
-              className={`px-3 py-1 rounded-lg text-white font-medium text-center ${
-                task.status === "progress"
-                  ? "bg-blue-300"
-                  : task.status === "approved"
-                  ? "bg-green-300"
-                  : task.status === "review"
-                  ? "bg-yellow-300"
-                  : "bg-red-300"
-              }`}
-            >
-              {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
-            </span>
-            <span className="flex-1">
-              {usersList.find((u) => u.id === task.assignedto)?.username ||
-                "Unknown User"}
-            </span>
-            <span className="whitespace-nowrap text-gray-300">
-              {task.duedate || "No due date"}
-            </span>
-          </div>
-        </div>
-      ))}
-    </div>
-  )}
-</div>
-
-</div>
-
       </div>
-      <div className="w-full lg:w-1/3 p-6 bg-paper border-t lg:border-l lg:border-t-0">
-        <div className="flex items-center mb-6">
-          <p className="text-2xl font-semibold">Schedule</p>
+      <div className="w-full lg:w-1/3 p-8 bg-paper border-t lg:border-l lg:border-t-0">
+        <div className="flex items-center mb-8">
+          <p className="text-2xl font-semibold" id="schedule-heading">
+            Schedule
+          </p>
           {user.role === "manager" && (
             <button
               onClick={() => setShowScheduleModal(true)}
-              className="ml-auto bg-yellow-300 text-[var(--primary-text)] p-3 rounded-lg text-lg hover:bg-opacity-90"
-            style={{ color : "black"}}>
+              className="ml-auto bg-primary text-[var(--primary-text)] p-4 rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary"
+              aria-label="Add a new schedule"
+            >
               Add Schedule
             </button>
           )}
         </div>
-        <div className="space-y-4">
+        <div className="space-y-6" aria-labelledby="schedule-heading">
           {schedules.map((s) => (
             <div
               key={s.id}
-              className={`p-6 border-b text-lg`}
-              style={{backgroundColor:"#F5F5DC"}}
+              className="p-6 rounded-xl bg-paper shadow-md"
             >
               <div className="mb-4">
-                <div className="text-gray-600 mb-1">{s.time}</div>
+                <div className="text-gray-600 text-base">{s.time}</div>
                 <div className="text-xl font-semibold">{s.name}</div>
               </div>
               <div className="flex flex-wrap gap-4">
@@ -604,13 +650,13 @@ function TaskManager({ user, logout }) {
                     <div key={u.id} className="flex items-center">
                       <img
                         src={u.avatar}
-                        alt={u.username}
-                        className="w-10 h-10 rounded-full mr-2"
+                        alt={`Avatar of ${u.username}`}
+                        className="w-12 h-12 rounded-full mr-3"
                       />
                       <span>{u.username}</span>
                     </div>
                   ) : (
-                    <div key={mId}>Unknown User</div>
+                    <div key={mId} className="text-gray-600">Unknown User</div>
                   );
                 })}
               </div>
@@ -618,182 +664,269 @@ function TaskManager({ user, logout }) {
           ))}
         </div>
       </div>
-
       {showTaskModal && (
-        <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-paper p-6 w-full max-w-md text-black">
+        <div
+          className="fixed inset-0 bg-gray-200 bg-opacity-30 flex items-center justify-center z-50 p-4"
+          onKeyDown={(e) => handleKeyDown(e, setShowTaskModal)}
+        >
+          <div className="bg-paper p-8 w-full max-w-lg rounded-2xl shadow-lg">
             <form onSubmit={addTask}>
-              <label className="block text-lg mb-2">Task Name</label>
-              <input
-                type="text"
-                value={newTask.name}
-                onChange={(e) =>
-                  setNewTask({ ...newTask, name: e.target.value })
-                }
-                required
-                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
-              />
-              <label className="block text-lg mb-2">Status</label>
-              <select
-                value={newTask.status}
-                onChange={(e) =>
-                  setNewTask({ ...newTask, status: e.target.value })
-                }
-                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
-              >
-                <option value="progress">Progress</option>
-                <option value="approved">Approved</option>
-                <option value="review">Review</option>
-                <option value="waiting">Waiting</option>
-              </select>
-              <label className="block text-lg mb-2">Assign To</label>
-              <select
-                value={newTask.assignedto}
-                onChange={(e) =>
-                  setNewTask({ ...newTask, assignedto: e.target.value })
-                }
-                required
-                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
-              >
-                <option value="">Assign To</option>
-                {usersList
-                  .filter((u) => u.role === "user")
-                  .map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.username}
-                    </option>
-                  ))}
-              </select>
-              <label className="block text-lg mb-2">Due Date</label>
-              <input
-                type="date"
-                value={newTask.duedate}
-                onChange={(e) =>
-                  setNewTask({ ...newTask, duedate: e.target.value })
-                }
-                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
-              />
-              <div className="flex items-center mb-4">
-                <input
-                  type="checkbox"
-                  checked={newTask.isupcoming}
-                  onChange={(e) =>
-                    setNewTask({ ...newTask, isupcoming: e.target.checked })
-                  }
-                  className="w-6 h-6 accent-primary mr-2"
-                />
-                <label className="text-lg">Upcoming</label>
-              </div>
-              <div className="flex space-x-4">
-                <button
-                  type="submit"
-                  className="bg-black text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1"
-                >
-                  Add
-                </button>
-                <button
-                  onClick={() => setShowTaskModal(false)}
-                  className="bg-gray-300 text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1"
-                >
-                  Cancel
-                </button>
+              <h3 className="text-2xl font-semibold mb-6" id="add-task-heading">
+                Add New Task
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="task-name" className="block text-lg mb-2 font-medium">
+                    Task Name
+                  </label>
+                  <input
+                    id="task-name"
+                    type="text"
+                    value={newTask.name}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, name: e.target.value })
+                    }
+                    required
+                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                    placeholder="Enter task name"
+                    aria-required="true"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="task-status" className="block text-lg mb-2 font-medium">
+                    Status
+                  </label>
+                  <select
+                    id="task-status"
+                    value={newTask.status}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, status: e.target.value })
+                    }
+                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                    aria-label="Select task status"
+                  >
+                    <option value="progress">In Progress</option>
+                    <option value="approved">Approved</option>
+                    <option value="review">Review</option>
+                    <option value="waiting">Waiting</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="assign-to" className="block text-lg mb-2 font-medium">
+                    Assign To
+                  </label>
+                  <select
+                    id="assign-to"
+                    value={newTask.assignedto}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, assignedto: e.target.value })
+                    }
+                    required
+                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                    aria-required="true"
+                    aria-label="Assign task to user"
+                  >
+                    <option value="">Select User</option>
+                    {usersList
+                      .filter((u) => u.role === "user")
+                      .map((u) => (
+                        <option key={u.id} value={u.id}>
+                          {u.username}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="due-date" className="block text-lg mb-2 font-medium">
+                    Due Date
+                  </label>
+                  <input
+                    id="due-date"
+                    type="date"
+                    value={newTask.duedate}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, duedate: e.target.value })
+                    }
+                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                    aria-label="Select due date"
+                  />
+                </div>
+                <div className="flex items-center">
+                  <input
+                    id="upcoming-task"
+                    type="checkbox"
+                    checked={newTask.isupcoming}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, isupcoming: e.target.checked })
+                    }
+                    className="w-8 h-8 accent-primary mr-3"
+                    aria-label="Mark as upcoming task"
+                  />
+                  <label htmlFor="upcoming-task" className="text-lg">
+                    Upcoming Task
+                  </label>
+                </div>
+                <div className="flex space-x-4">
+                  <button
+                    type="submit"
+                    className="bg-primary text-[var(--primary-text)] p-4 rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary flex-1"
+                    aria-label="Add task"
+                  >
+                    Add
+                  </button>
+                  <button
+                    onClick={() => setShowTaskModal(false)}
+                    className="bg-gray-200 text-gray-800 p-4 rounded-lg text-lg font-semibold hover:bg-gray-300 focus:ring-4 focus:ring-primary flex-1"
+                    aria-label="Cancel adding task"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
             </form>
           </div>
         </div>
       )}
-
       {showScheduleModal && (
-        <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-paper p-6 w-full max-w-md">
+        <div
+          className="fixed inset-0 bg-gray-200 bg-opacity-30 flex items-center justify-center z-50 p-4"
+          onKeyDown={(e) => handleKeyDown(e, setShowScheduleModal)}
+        >
+          <div className="bg-paper p-8 w-full max-w-lg rounded-2xl shadow-lg">
             <form onSubmit={addSchedule}>
-              <label className="block text-lg mb-2">Date</label>
-              <input
-                type="date"
-                value={newSchedule.date}
-                onChange={(e) =>
-                  setNewSchedule({ ...newSchedule, date: e.target.value })
-                }
-                required
-                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
-              />
-              <label className="block text-lg mb-2">Start Time</label>
-              <input
-                type="time"
-                value={newSchedule.startTime}
-                onChange={(e) =>
-                  setNewSchedule({ ...newSchedule, startTime: e.target.value })
-                }
-                required
-                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
-              />
-              <label className="block text-lg mb-2">End Time</label>
-              <input
-                type="time"
-                value={newSchedule.endTime}
-                onChange={(e) =>
-                  setNewSchedule({ ...newSchedule, endTime: e.target.value })
-                }
-                required
-                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
-              />
-              <label className="block text-lg mb-2">Schedule Name</label>
-              <input
-                type="text"
-                value={newSchedule.name}
-                onChange={(e) =>
-                  setNewSchedule({ ...newSchedule, name: e.target.value })
-                }
-                required
-                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
-              />
-              <label className="block text-lg mb-2">Members</label>
-              <select
-                multiple
-                value={newSchedule.members}
-                onChange={(e) =>
-                  setNewSchedule({
-                    ...newSchedule,
-                    members: Array.from(
-                      e.target.selectedOptions,
-                      (option) => option.value
-                    ),
-                  })
-                }
-                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
-              >
-                {usersList.map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.username}
-                  </option>
-                ))}
-              </select>
-              <label className="block text-lg mb-2">Color</label>
-              <select
-                value={newSchedule.color}
-                onChange={(e) =>
-                  setNewSchedule({ ...newSchedule, color: e.target.value })
-                }
-                className="border border-gray-300 p-3 w-full mb-4 rounded-lg text-lg focus:outline-none focus:border-primary"
-              >
-                <option value="yellow">Yellow</option>
-                <option value="blue">Blue</option>
-                <option value="red">Red</option>
-                <option value="green">Green</option>
-              </select>
-              <div className="flex space-x-4">
-                <button
-                  type="submit"
-                  className="bg-green-300 text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1"
-                >
-                  Add
-                </button>
-                <button
-                  onClick={() => setShowScheduleModal(false)}
-                  className="bg-gray-300 text-white p-3 rounded-lg text-lg hover:bg-opacity-90 flex-1"
-                >
-                  Cancel
-                </button>
+              <h3 className="text-2xl font-semibold mb-6" id="add-schedule-heading">
+                Add New Schedule
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="schedule-date" className="block text-lg mb-2 font-medium">
+                    Date
+                  </label>
+                  <input
+                    id="schedule-date"
+                    type="date"
+                    value={newSchedule.date}
+                    onChange={(e) =>
+                      setNewSchedule({ ...newSchedule, date: e.target.value })
+                    }
+                    required
+                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                    aria-required="true"
+                    aria-label="Select schedule date"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="start-time" className="block text-lg mb-2 font-medium">
+                    Start Time
+                  </label>
+                  <input
+                    id="start-time"
+                    type="time"
+                    value={newSchedule.startTime}
+                    onChange={(e) =>
+                      setNewSchedule({ ...newSchedule, startTime: e.target.value })
+                    }
+                    required
+                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                    aria-required="true"
+                    aria-label="Select start time"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="end-time" className="block text-lg mb-2 font-medium">
+                    End Time
+                  </label>
+                  <input
+                    id="end-time"
+                    type="time"
+                    value={newSchedule.endTime}
+                    onChange={(e) =>
+                      setNewSchedule({ ...newSchedule, endTime: e.target.value })
+                    }
+                    required
+                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                    aria-required="true"
+                    aria-label="Select end time"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="schedule-name" className="block text-lg mb-2 font-medium">
+                    Schedule Name
+                  </label>
+                  <input
+                    id="schedule-name"
+                    type="text"
+                    value={newSchedule.name}
+                    onChange={(e) =>
+                      setNewSchedule({ ...newSchedule, name: e.target.value })
+                    }
+                    required
+                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                    placeholder="Enter schedule name"
+                    aria-required="true"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="members" className="block text-lg mb-2 font-medium">
+                    Members
+                  </label>
+                  <select
+                    id="members"
+                    multiple
+                    value={newSchedule.members}
+                    onChange={(e) =>
+                      setNewSchedule({
+                        ...newSchedule,
+                        members: Array.from(
+                          e.target.selectedOptions,
+                          (option) => option.value
+                        ),
+                      })
+                    }
+                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                    aria-label="Select members for schedule"
+                  >
+                    {usersList.map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {u.username}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="schedule-color" className="block text-lg mb-2 font-medium">
+                    Color
+                  </label>
+                  <select
+                    id="schedule-color"
+                    value={newSchedule.color}
+                    onChange={(e) =>
+                      setNewSchedule({ ...newSchedule, color: e.target.value })
+                    }
+                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                    aria-label="Select schedule color"
+                  >
+                    <option value="yellow">Yellow</option>
+                    <option value="blue">Blue</option>
+                    <option value="green">Green</option>
+                  </select>
+                </div>
+                <div className="flex space-x-4">
+                  <button
+                    type="submit"
+                    className="bg-primary text-[var(--primary-text)] p-4 rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary flex-1"
+                    aria-label="Add schedule"
+                  >
+                    Add
+                  </button>
+                  <button
+                    onClick={() => setShowScheduleModal(false)}
+                    className="bg-gray-200 text-gray-800 p-4 rounded-lg text-lg font-semibold hover:bg-gray-300 focus:ring-4 focus:ring-primary flex-1"
+                    aria-label="Cancel adding schedule"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
             </form>
           </div>
