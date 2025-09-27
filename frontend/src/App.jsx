@@ -490,7 +490,7 @@ function TaskManager({ user, logout }) {
           </button>
           <button
             onClick={logout}
-            className="ml-4 bg-red-300 text-white p-4 rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary"
+            className="ml-4 bg-violet-300 text-white p-4 rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary"
             aria-label="Log out"
           >
             Log Out
