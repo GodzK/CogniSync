@@ -105,7 +105,7 @@ app.post("/api/login", async (req, res) => {
 
 // Get all users (manager only)  , auth(["manager"])
 app.get("/api/users", async (req, res) => {
-  const { data, error } = await supabase.from("users").select("id, username, avatar, role, firstname, lastname, tel , rule",);
+  const { data, error } = await supabase.from("users").select("id, username, avatar, role");
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
 });
