@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "./axios";
 import swal from "sweetalert";
+import Chart from "./components/Chart";
 import { jwtDecode } from "jwt-decode";
 
 function App() {
@@ -244,9 +245,25 @@ function TaskManager({ user, logout }) {
   const [showSettings, setShowSettings] = useState(false);
   const [fontSize, setFontSize] = useState(18);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [file, setFile] = useState(null);
+  const [showUsersModal, setShowUsersModal] = useState(false);
 const openModal = (task) => setSelectedTask(task);
 const closeModal = () => setSelectedTask(null);
 
+  const handleFileSubmit = () => {
+    if (!file) {
+      swal("ไม่มีงานที่จะส่ง", "คุณอย่าลืมใส่ไฟล์");
+      return;
+    }
+swal({
+  title: "Good job!",
+  text: "ส่งไฟล์สำเร็จ! คุณทำงานดีดีมากๆ",
+  icon: "success",
+  button: "Aww yiss!",
+});
+
+    setFile(null); 
+  };
   const [colorTemplate, setColorTemplate] = useState("calmBlue");
   const [newTask, setNewTask] = useState({
     name: "",
@@ -428,82 +445,91 @@ const closeModal = () => setSelectedTask(null);
           Back
         </button>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-paper p-8 rounded-2xl shadow-md">
-            <h3 className="text-2xl font-semibold mb-4" id="user-details">
-              Your Profile
-            </h3>
-            <div className="space-y-3 text-lg" aria-labelledby="user-details">
-              <p>
-                <span className="font-semibold">Username:</span> {user.username}
-              </p>
-              <p>
-                <span className="font-semibold">First Name:</span>{" "}
-                {user.firstname}
-              </p>
-              <p>
-                <span className="font-semibold">Last Name:</span>{" "}
-                {user.lastname}
-              </p>
-              <p>
-                <span className="font-semibold">Phone:</span> {user.tel}
-              </p>
-              <p className="pt-2 text-xl">
-                <span className="font-semibold">Role:</span>{" "}
-                {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-              </p>
-            </div>
-          </div>
-          <div className="col-span-2 bg-paper p-8 rounded-2xl shadow-md">
-            <h2 className="text-3xl font-semibold mb-6" id="settings-heading">
-              Settings
-            </h2>
-            <div className="mb-8">
-              <label
-                htmlFor="font-size"
-                className="block text-lg mb-2 font-medium"
-              >
-                Font Size
-              </label>
-              <input
-                id="font-size"
-                type="range"
-                min={12}
-                max={28}
-                step={1}
-                value={fontSize}
-                onChange={(e) => setFontSize(Number(e.target.value))}
-                className="w-full h-3 accent-primary"
-                aria-label="Adjust font size"
-              />
-              <span className="text-sm text-gray-600 mt-2 block">
-                {fontSize}px
-              </span>
-            </div>
-            <div className="mb-8">
-              <label
-                htmlFor="color-template"
-                className="block text-lg mb-2 font-medium"
-              >
-                Color Theme
-              </label>
-              <select
-                id="color-template"
-                value={colorTemplate}
-                onChange={(e) => setColorTemplate(e.target.value)}
-                className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
-                aria-label="Select color theme"
-              >
-                <option value="calmBlue">Calm Blue</option>
-                <option value="softGreen">Soft Green</option>
-                <option value="gentleCream">Gentle Cream</option>
-              </select>
-            </div>
-            <h3 className="text-2xl font-semibold mb-4">Work Overview</h3>
-            <div className="h-80 w-full bg-gray-100 rounded-xl flex items-center justify-center text-lg text-gray-600 shadow-inner">
-              Chart Coming Soon
-            </div>
-          </div>
-        </div>
+  <div className="bg-paper p-8 rounded-2xl shadow-md">
+    <h3 className="text-2xl font-semibold mb-4" id="user-details">
+      Your Profile
+    </h3>
+    <div className="space-y-3 text-lg" aria-labelledby="user-details">
+      <p>
+        <span className="font-semibold">Username:</span> {user.username}
+      </p>
+      <p>
+        <span className="font-semibold">First Name:</span> {user.firstname}
+      </p>
+      <p>
+        <span className="font-semibold">Last Name:</span> {user.lastname}
+      </p>
+      <p>
+        <span className="font-semibold">Phone:</span> {user.tel}
+      </p>
+      <p className="pt-2 text-xl">
+        <span className="font-semibold">Role:</span>{" "}
+        {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+      </p>
+
+      {user.role === "user" && (
+        <p className="pt-2 text-xl">
+          <span className="font-semibold">วิธีการรับมือ:</span>{" "}
+          ต้องพูดอย่างใจเย็น และให้กำลังใจบ่อยๆ
+        </p>
+      )}
+    </div>
+  </div>
+
+  <div className="col-span-2 bg-paper p-8 rounded-2xl shadow-md">
+    <h2 className="text-3xl font-semibold mb-6" id="settings-heading">
+      Settings
+    </h2>
+    <div className="mb-8">
+      <label htmlFor="font-size" className="block text-lg mb-2 font-medium">
+        Font Size
+      </label>
+      <input
+        id="font-size"
+        type="range"
+        min={12}
+        max={28}
+        step={1}
+        value={fontSize}
+        onChange={(e) => setFontSize(Number(e.target.value))}
+        className="w-full h-3 accent-primary"
+        aria-label="Adjust font size"
+      />
+      <span className="text-sm text-gray-600 mt-2 block">{fontSize}px</span>
+    </div>
+
+    <div className="mb-8">
+      <label
+        htmlFor="color-template"
+        className="block text-lg mb-2 font-medium"
+      >
+        Color Theme
+      </label>
+      <select
+        id="color-template"
+        value={colorTemplate}
+        onChange={(e) => setColorTemplate(e.target.value)}
+        className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+        aria-label="Select color theme"
+      >
+        <option value="calmBlue">Calm Blue</option>
+        <option value="softGreen">Soft Green</option>
+        <option value="gentleCream">Gentle Cream</option>
+      </select>
+    </div>
+
+    {user.role === "user" && (
+      <>
+        <h3 className="text-2xl font-semibold mb-4">Work Overview</h3>
+        <div className="w-full min-h-[300px] bg-gray-100 rounded-xl p-4 shadow-inner">
+  <Chart />
+</div>
+
+      </>
+    )}
+  </div>
+</div>
+
       </div>
     );
   }
@@ -554,13 +580,23 @@ const closeModal = () => setSelectedTask(null);
           </button>
         </div>
         {user.role === "manager" && (
-          <button
+          <><button
             onClick={() => setShowTaskModal(true)}
             className="bg-primary text-[var(--primary-text)] p-4 rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary mb-8 w-full sm:w-auto"
             aria-label="Add a new task"
           >
             Add Task
           </button>
+          <button
+  onClick={() => setShowUsersModal(true)}
+  className="bg-primary text-[var(--primary-text)] p-4 rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary w-full sm:w-auto"
+  aria-label="View users"
+>
+  View Users
+</button>
+          </>
+          
+          
         )}
         <div className="space-y-8">
           <div>
@@ -597,6 +633,62 @@ const closeModal = () => setSelectedTask(null);
         ดูเพิ่มเติม
       </button>
     )}
+    {showUsersModal && (
+  <div
+    className="fixed inset-0 bg-gray-200 bg-opacity-30 flex items-center justify-center z-50 p-4"
+    onKeyDown={(e) => handleKeyDown(e, setShowUsersModal)}
+  >
+    <div className="bg-paper px-4 py-6 w-full sm:max-w-3xl max-w-full rounded-2xl shadow-lg overflow-y-auto max-h-screen">
+      <h3 className="text-2xl font-semibold mb-6" id="view-users-heading">
+        View Users
+      </h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {usersList
+          .filter((u) => u.role === "user")
+          .map((u) => (
+            <div
+              key={u.id}
+              className="bg-white p-6 rounded-xl shadow-md"
+            >
+              <h4 className="text-xl font-semibold mb-4">
+                {u.username}
+              </h4>
+              <div className="space-y-2 text-lg">
+                <p>
+                  <span className="font-semibold">First Name:</span>{" "}
+                  {u.firstname}
+                </p>
+                <p>
+                  <span className="font-semibold">Last Name:</span>{" "}
+                  {u.lastname}
+                </p>
+                <p>
+                  <span className="font-semibold">Phone:</span> {u.tel}
+                </p>
+                <p>
+                  <span className="font-semibold">Role:</span>{" "}
+                  {u.role.charAt(0).toUpperCase() + u.role.slice(1)}
+                </p>
+                <p>
+                  <span className="font-semibold">คำเเนะนำ:</span>{" "}
+                  {u.rule}
+                </p>
+              </div>
+            </div>
+          ))}
+      </div>
+      <div className="flex justify-end mt-6">
+        <button
+          onClick={() => setShowUsersModal(false)}
+          className="bg-gray-200 text-gray-800 p-4 rounded-lg text-lg font-semibold hover:bg-gray-300 focus:ring-4 focus:ring-primary"
+          aria-label="Close users modal"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
                     </label>
                    
                   </div>
@@ -624,9 +716,30 @@ const closeModal = () => setSelectedTask(null);
                     <span className="text-gray-600">
                       Due: {task.duedate || "None"}
                     </span>
+                    {user.role === "user" && (
+  <div className="bg-paper rounded-lg shadow p-4">
+    <h2 className="text-lg font-semibold mb-2">แนบไฟล์</h2>
+    <input
+      type="file"
+      onChange={(e) => setFile(e.target.files[0])}
+      className="block w-full text-sm text-gray-700 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary p-1"
+    />
+    {file && (
+      <p className="mt-1 text-gray-500 text-xs">ไฟล์ที่เลือก: {file.name}</p>
+    )}
+    <button
+      onClick={handleFileSubmit}
+      className="mt-2 px-3 py-1 text-sm bg-primary text-black rounded-md hover:bg-primary/90 transition"
+    >
+      ส่งไฟล์
+    </button>
+  </div>
+)}
+
                   </div>
                 </div>
               ))}
+              
             </div>
           </div>
           <div>
@@ -774,169 +887,148 @@ const closeModal = () => setSelectedTask(null);
           className="fixed inset-0 bg-gray-200 bg-opacity-30 flex items-center justify-center z-50 p-4"
           onKeyDown={(e) => handleKeyDown(e, setShowTaskModal)}
         >
-          <div className="bg-paper p-8 w-full max-w-lg rounded-2xl shadow-lg">
-            <form onSubmit={addTask}>
-              <h3 className="text-2xl font-semibold mb-6" id="add-task-heading">
-                Add New Task
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="task-name"
-                    className="block text-lg mb-2 font-medium"
-                  >
-                    Task Name
-                  </label>
-                  <input
-                    id="task-name"
-                    type="text"
-                    value={newTask.name}
-                    onChange={(e) =>
-                      setNewTask({ ...newTask, name: e.target.value })
-                    }
-                    required
-                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
-                    placeholder="Enter task name"
-                    aria-required="true"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="task-description"
-                    className="block text-lg mb-2 font-medium"
-                  >
-                    Description
-                  </label>
-                  <textarea
-                    id="task-description"
-                    value={newTask.description}
-                    onChange={(e) =>
-                      setNewTask({ ...newTask, description: e.target.value })
-                    }
-                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
-                    placeholder="Enter task description"
-                    rows={3}
-                  />
-                </div>
+          <div className="bg-paper px-4 py-6 w-full sm:max-w-lg max-w-full rounded-2xl shadow-lg overflow-y-auto max-h-screen">
+  <form onSubmit={addTask}>
+    <h3 className="text-2xl font-semibold mb-6" id="add-task-heading">
+      Add New Task
+    </h3>
+    <div className="space-y-4">
+      {/* Task Name */}
+      <div>
+        <label htmlFor="task-name" className="block text-lg mb-2 font-medium">
+          Task Name
+        </label>
+        <input
+          id="task-name"
+          type="text"
+          value={newTask.name}
+          onChange={(e) => setNewTask({ ...newTask, name: e.target.value })}
+          required
+          className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+          placeholder="Enter task name"
+          aria-required="true"
+        />
+      </div>
 
-                <div>
-                  <label
-                    htmlFor="task-status"
-                    className="block text-lg mb-2 font-medium"
-                  >
-                    Status
-                  </label>
-                  <select
-                    id="task-status"
-                    value={newTask.status}
-                    onChange={(e) =>
-                      setNewTask({ ...newTask, status: e.target.value })
-                    }
-                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
-                    aria-label="Select task status"
-                  >
-                    <option value="progress">In Progress</option>
-                    <option value="approved">Approved</option>
-                    <option value="review">Review</option>
-                    <option value="waiting">Waiting</option>
-                  </select>
-                </div>
-                <div>
-                  <label
-                    htmlFor="assign-to"
-                    className="block text-lg mb-2 font-medium"
-                  >
-                    Assign To
-                  </label>
-                  <select
-                    id="assign-to"
-                    value={newTask.assignedto}
-                    onChange={(e) =>
-                      setNewTask({ ...newTask, assignedto: e.target.value })
-                    }
-                    required
-                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
-                    aria-required="true"
-                    aria-label="Assign task to user"
-                  >
-                    <option value="">Select User</option>
-                    {usersList
-                      .filter((u) => u.role === "user")
-                      .map((u) => (
-                        <option key={u.id} value={u.id}>
-                          {u.username}
-                        </option>
-                      ))}
-                  </select>
-                </div>
-                <div>
-                  <label
-                    htmlFor="due-date"
-                    className="block text-lg mb-2 font-medium"
-                  >
-                    Due Date
-                  </label>
-                  <input
-                    id="due-date"
-                    type="date"
-                    value={newTask.duedate}
-                    onChange={(e) =>
-                      setNewTask({ ...newTask, duedate: e.target.value })
-                    }
-                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
-                    aria-label="Select due date"
-                  />
-                </div>
-                <div className="flex items-center">
-                  <input
-                    id="upcoming-task"
-                    type="checkbox"
-                    checked={newTask.isupcoming}
-                    onChange={(e) =>
-                      setNewTask({ ...newTask, isupcoming: e.target.checked })
-                    }
-                    className="w-8 h-8 accent-primary mr-3"
-                    aria-label="Mark as upcoming task"
-                  />
-                  <label htmlFor="upcoming-task" className="text-lg">
-                    Upcoming Task
-                  </label>
-                </div>
-                <div className="flex space-x-4">
-                 <button
-  type="submit"
-  className="bg-primary text-[var(--primary-text)] p-4 rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary flex-1"
-  aria-label="Add task"
->
-  Add
-</button>
+      {/* Description */}
+      <div>
+        <label htmlFor="task-description" className="block text-lg mb-2 font-medium">
+          Description
+        </label>
+        <textarea
+          id="task-description"
+          value={newTask.description}
+          onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+          className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+          placeholder="Enter task description"
+          rows={3}
+        />
+      </div>
 
-                  <button
-                    onClick={() => setShowTaskModal(false)}
-                    className="bg-gray-200 text-gray-800 p-4 rounded-lg text-lg font-semibold hover:bg-gray-300 focus:ring-4 focus:ring-primary flex-1"
-                    aria-label="Cancel adding task"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
+      {/* Status */}
+      <div>
+        <label htmlFor="task-status" className="block text-lg mb-2 font-medium">
+          Status
+        </label>
+        <select
+          id="task-status"
+          value={newTask.status}
+          onChange={(e) => setNewTask({ ...newTask, status: e.target.value })}
+          className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+          aria-label="Select task status"
+        >
+          <option value="progress">In Progress</option>
+          <option value="approved">Approved</option>
+          <option value="review">Review</option>
+          <option value="waiting">Waiting</option>
+        </select>
+      </div>
+
+      {/* Assign To */}
+      <div>
+        <label htmlFor="assign-to" className="block text-lg mb-2 font-medium">
+          Assign To
+        </label>
+        <select
+          id="assign-to"
+          value={newTask.assignedto}
+          onChange={(e) => setNewTask({ ...newTask, assignedto: e.target.value })}
+          required
+          className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+          aria-required="true"
+          aria-label="Assign task to user"
+        >
+          <option value="">Select User</option>
+          {usersList
+            .filter((u) => u.role === "user")
+            .map((u) => (
+              <option key={u.id} value={u.id}>
+                {u.username}
+              </option>
+            ))}
+        </select>
+      </div>
+
+      {/* Due Date */}
+      <div>
+        <label htmlFor="due-date" className="block text-lg mb-2 font-medium">
+          Due Date
+        </label>
+        <input
+          id="due-date"
+          type="date"
+          value={newTask.duedate}
+          onChange={(e) => setNewTask({ ...newTask, duedate: e.target.value })}
+          className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+          aria-label="Select due date"
+        />
+      </div>
+
+      {/* Upcoming Task */}
+      <div className="flex items-center">
+        <input
+          id="upcoming-task"
+          type="checkbox"
+          checked={newTask.isupcoming}
+          onChange={(e) => setNewTask({ ...newTask, isupcoming: e.target.checked })}
+          className="w-6 h-6 accent-primary mr-3"
+          aria-label="Mark as upcoming task"
+        />
+        <label htmlFor="upcoming-task" className="text-lg">
+          Upcoming Task
+        </label>
+      </div>
+
+      {/* Buttons */}
+      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+        <button
+          type="submit"
+          className="bg-primary text-[var(--primary-text)] p-4 rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary flex-1"
+          aria-label="Add task"
+        >
+          Add
+        </button>
+        <button
+          onClick={() => setShowTaskModal(false)}
+          className="bg-gray-200 text-gray-800 p-4 rounded-lg text-lg font-semibold hover:bg-gray-300 focus:ring-4 focus:ring-primary flex-1"
+          aria-label="Cancel adding task"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+
         </div>
       )}
       {showScheduleModal && (
-        <div
-          className="fixed inset-0 bg-gray-200 bg-opacity-30 flex items-center justify-center z-50 p-4"
-          onKeyDown={(e) => handleKeyDown(e, setShowScheduleModal)}
-        >
-          <div className="bg-paper p-6 sm:p-8 w-full sm:max-w-md md:max-w-lg rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto">
-            <form onSubmit={addSchedule}>
-              <h3
-                className="text-xl sm:text-2xl font-semibold mb-6"
-                id="add-schedule-heading"
-              >
-                Add New Schedule
-              </h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 sm:px-6">
+  <div className="bg-white w-full max-w-full sm:max-w-md md:max-w-lg rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+    <form onSubmit={addSchedule}>
+      <h3 className="text-xl sm:text-2xl font-semibold mb-6" id="add-schedule-heading">
+        Add New Schedule
+      </h3>
               <div className="space-y-4">
                 {/* Date */}
                 <div>
