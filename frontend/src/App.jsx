@@ -12,7 +12,7 @@ function App() {
   const [tel, setTel] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("user");
-  
+   
   useEffect(() => {
     if (token) {
       const decoded = jwtDecode(token);
@@ -88,13 +88,19 @@ function App() {
     setUser(null);
   };
 
-if (!user) {
+  if (!user) {
     return (
       <div
         className="flex justify-center items-center min-h-screen flex-col bg-background px-4"
-        style={{ backgroundColor: "var(--background)", fontFamily: "Arial, sans-serif" }}
+        style={{
+          backgroundColor: "var(--background)",
+          fontFamily: "Arial, sans-serif",
+        }}
       >
-        <h2 className="text-3xl font-bold mb-6" aria-label={isLogin ? "Login form" : "Register form"}>
+        <h2
+          className="text-3xl font-bold mb-6"
+          aria-label={isLogin ? "Login form" : "Register form"}
+        >
           {isLogin ? "Login" : "Register"}
         </h2>
         <form
@@ -103,7 +109,10 @@ if (!user) {
           aria-labelledby={isLogin ? "login-heading" : "register-heading"}
         >
           <div>
-            <label htmlFor="username" className="block text-lg mb-2 font-medium">
+            <label
+              htmlFor="username"
+              className="block text-lg mb-2 font-medium"
+            >
               Username
             </label>
             <input
@@ -117,7 +126,10 @@ if (!user) {
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-lg mb-2 font-medium">
+            <label
+              htmlFor="password"
+              className="block text-lg mb-2 font-medium"
+            >
               Password
             </label>
             <input
@@ -133,7 +145,10 @@ if (!user) {
           {!isLogin && (
             <>
               <div>
-                <label htmlFor="firstname" className="block text-lg mb-2 font-medium">
+                <label
+                  htmlFor="firstname"
+                  className="block text-lg mb-2 font-medium"
+                >
                   First Name
                 </label>
                 <input
@@ -147,7 +162,10 @@ if (!user) {
                 />
               </div>
               <div>
-                <label htmlFor="lastname" className="block text-lg mb-2 font-medium">
+                <label
+                  htmlFor="lastname"
+                  className="block text-lg mb-2 font-medium"
+                >
                   Last Name
                 </label>
                 <input
@@ -175,7 +193,10 @@ if (!user) {
                 />
               </div>
               <div>
-                <label htmlFor="role" className="block text-lg mb-2 font-medium">
+                <label
+                  htmlFor="role"
+                  className="block text-lg mb-2 font-medium"
+                >
                   Role
                 </label>
                 <select
@@ -224,10 +245,11 @@ function TaskManager({ user, logout }) {
   const [colorTemplate, setColorTemplate] = useState("calmBlue");
   const [newTask, setNewTask] = useState({
     name: "",
+    description: "",
     status: "progress",
-    assignedto: "", // Changed to match backend field name
-    isupcoming: false, // Changed to match backend field name
-    duedate: "", // Changed to match backend field name
+    assignedto: "",
+    isupcoming: false,
+    duedate: "",
   });
   const [newSchedule, setNewSchedule] = useState({
     date: "",
@@ -241,10 +263,11 @@ function TaskManager({ user, logout }) {
   useEffect(() => {
     document.documentElement.style.fontSize = `${fontSize}px`;
   }, [fontSize]);
+const [selectedTask, setSelectedTask] = useState(null);
 
   useEffect(() => {
     const root = document.documentElement;
-   let primary = "#4A90E2"; // Soft blue
+    let primary = "#4A90E2"; // Soft blue
     let secondary = "#A3BFFA"; // Lighter blue
     let background = "#F0F4FF"; // Very light blue
     let paper = "#F9F9F9"; // Off-white
@@ -266,7 +289,7 @@ function TaskManager({ user, logout }) {
         paper = "#F0FFF4";
         primaryText = "#1A202C";
         break;
-        // gentle cream
+      // gentle cream
       case "gentleCream":
         primary = "#F6E05E";
         secondary = "#FEFCBF";
@@ -330,6 +353,7 @@ function TaskManager({ user, logout }) {
       setShowTaskModal(false);
       setNewTask({
         name: "",
+        description: "",
         status: "progress",
         assignedto: "",
         isupcoming: false,
@@ -341,7 +365,7 @@ function TaskManager({ user, logout }) {
     }
   };
 
-   const addSchedule = async (e) => {
+  const addSchedule = async (e) => {
     e.preventDefault();
     const time = `${newSchedule.date} ${newSchedule.startTime} - ${newSchedule.endTime}`;
     try {
@@ -361,12 +385,11 @@ function TaskManager({ user, logout }) {
       alert(err.response?.data?.error || "Failed to add schedule.");
     }
   };
-   const handleKeyDown = (e, setModal) => {
+  const handleKeyDown = (e, setModal) => {
     if (e.key === "Escape") {
       setModal(false);
     }
   };
-
 
   const currentTasks = tasks.filter((t) => !t.isupcoming);
   const upcomingTasks = tasks.filter((t) => t.isupcoming);
@@ -375,7 +398,10 @@ function TaskManager({ user, logout }) {
     return (
       <div
         className="min-h-screen p-8 bg-background"
-        style={{ backgroundColor: "var(--background)", fontFamily: "Arial, sans-serif" }}
+        style={{
+          backgroundColor: "var(--background)",
+          fontFamily: "Arial, sans-serif",
+        }}
       >
         <button
           onClick={() => setShowSettings(false)}
@@ -394,10 +420,12 @@ function TaskManager({ user, logout }) {
                 <span className="font-semibold">Username:</span> {user.username}
               </p>
               <p>
-                <span className="font-semibold">First Name:</span> {user.firstname}
+                <span className="font-semibold">First Name:</span>{" "}
+                {user.firstname}
               </p>
               <p>
-                <span className="font-semibold">Last Name:</span> {user.lastname}
+                <span className="font-semibold">Last Name:</span>{" "}
+                {user.lastname}
               </p>
               <p>
                 <span className="font-semibold">Phone:</span> {user.tel}
@@ -413,7 +441,10 @@ function TaskManager({ user, logout }) {
               Settings
             </h2>
             <div className="mb-8">
-              <label htmlFor="font-size" className="block text-lg mb-2 font-medium">
+              <label
+                htmlFor="font-size"
+                className="block text-lg mb-2 font-medium"
+              >
                 Font Size
               </label>
               <input
@@ -432,7 +463,10 @@ function TaskManager({ user, logout }) {
               </span>
             </div>
             <div className="mb-8">
-              <label htmlFor="color-template" className="block text-lg mb-2 font-medium">
+              <label
+                htmlFor="color-template"
+                className="block text-lg mb-2 font-medium"
+              >
                 Color Theme
               </label>
               <select
@@ -460,11 +494,17 @@ function TaskManager({ user, logout }) {
   return (
     <div
       className="flex flex-col lg:flex-row min-h-screen bg-background"
-      style={{ backgroundColor: "var(--background)", fontFamily: "Arial, sans-serif" }}
+      style={{
+        backgroundColor: "var(--background)",
+        fontFamily: "Arial, sans-serif",
+      }}
     >
       <div className="flex-1 p-8">
         <div className="flex items-center mb-8">
-          <span className="text-2xl font-semibold" aria-label={`Welcome, ${user.username}`}>
+          <span
+            className="text-2xl font-semibold"
+            aria-label={`Welcome, ${user.username}`}
+          >
             {user.username || "User"}
           </span>
           <button
@@ -505,118 +545,158 @@ function TaskManager({ user, logout }) {
             Add Task
           </button>
         )}
-        <div className="space-y-8">
-          <div>
-            <h2 className="text-2xl font-bold mb-4" id="current-tasks">
-              Current Tasks
-            </h2>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {currentTasks.map((task) => (
-                <div
-                  key={task.id}
-                  className="bg-paper rounded-xl shadow-md p-6 flex flex-col gap-4"
+         <div className="space-y-8">
+      {/* Current Tasks */}
+      <div>
+        <h2 className="text-2xl font-bold mb-4" id="current-tasks">
+          Current Tasks
+        </h2>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {currentTasks.map((task) => (
+            <div
+              key={task.id}
+              className="bg-paper rounded-xl shadow-md p-6 flex flex-col gap-4"
+            >
+              <div className="flex items-start gap-4">
+                <input
+                  type="checkbox"
+                  id={`task-${task.id}`}
+                  checked={task.checked}
+                  onChange={(e) => handleCheck(task.id, e.target.checked)}
+                  className="w-8 h-8 accent-primary mt-1"
+                  aria-label={`Mark task ${task.name} as completed`}
+                />
+                <label
+                  htmlFor={`task-${task.id}`}
+                  className="flex-1 text-lg font-semibold leading-snug break-words"
                 >
-                  <div className="flex items-start gap-4">
-                    <input
-                      type="checkbox"
-                      id={`task-${task.id}`}
-                      checked={task.checked}
-                      onChange={(e) => handleCheck(task.id, e.target.checked)}
-                      className="w-8 h-8 accent-primary mt-1"
-                      aria-label={`Mark task ${task.name} as completed`}
-                    />
-                    <label
-                      htmlFor={`task-${task.id}`}
-                      className="flex-1 text-lg font-semibold leading-snug break-words"
-                    >
-                      {task.name}
-                    </label>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-3 text-base">
-                    <span
-                      className={`px-3 py-1 rounded-lg text-white font-medium ${
-                        task.status === "progress"
-                          ? "bg-blue-300"
-                          : task.status === "approved"
-                          ? "bg-green-300"
-                          : task.status === "review"
-                          ? "bg-yellow-300"
-                          : "bg-red-300"
-                      }`}
-                      aria-label={`Status: ${task.status}`}
-                    >
-                      {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
-                    </span>
-                    <span className="flex-1">
-                      Assigned: {usersList.find((u) => u.id === task.assignedto)?.username || "Unknown"}
-                    </span>
-                    <span className="text-gray-600">
-                      Due: {task.duedate || "None"}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                  {task.name}
+                  
+                    <p className="text-gray-600 text-base break-words">
+                      <button
+                        onClick={() => setSelectedTask(task)}
+                        className="text-blue-500 underline ml-2"
+                      >
+                        View Description
+                      </button>
+                    </p>
+                  
+                </label>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 text-base">
+                <span
+                  className={`px-3 py-1 rounded-lg text-white font-medium ${
+                    task.status === "progress"
+                      ? "bg-blue-300"
+                      : task.status === "approved"
+                      ? "bg-green-300"
+                      : task.status === "review"
+                      ? "bg-yellow-300"
+                      : "bg-red-300"
+                  }`}
+                  aria-label={`Status: ${task.status}`}
+                >
+                  {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+                </span>
+                <span className="flex-1">
+                  Assigned:{" "}
+                  {usersList.find((u) => u.id === task.assignedto)?.username ||
+                    "Unknown"}
+                </span>
+                <span className="text-gray-600">
+                  Due: {task.duedate || "None"}
+                </span>
+              </div>
             </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Upcoming Tasks */}
+      <div>
+        <h2 className="text-2xl font-bold mb-4" id="upcoming-tasks">
+          Upcoming Tasks
+        </h2>
+        {upcomingTasks.length === 0 ? (
+          <div className="bg-paper rounded-xl shadow-md p-6 text-center text-gray-600 text-lg">
+            No Upcoming Tasks
           </div>
-          <div>
-            <h2 className="text-2xl font-bold mb-4" id="upcoming-tasks">
-              Upcoming Tasks
-            </h2>
-            {upcomingTasks.length === 0 ? (
-              <div className="bg-paper rounded-xl shadow-md p-6 text-center text-gray-600 text-lg">
-                No Upcoming Tasks
-              </div>
-            ) : (
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {upcomingTasks.map((task) => (
-                  <div
-                    key={task.id}
-                    className="bg-paper rounded-xl shadow-md p-6 flex flex-col gap-4"
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {upcomingTasks.map((task) => (
+              <div
+                key={task.id}
+                className="bg-paper rounded-xl shadow-md p-6 flex flex-col gap-4"
+              >
+                <div className="flex items-start gap-4">
+                  <input
+                    type="checkbox"
+                    id={`task-${task.id}`}
+                    checked={task.checked}
+                    onChange={(e) => handleCheck(task.id, e.target.checked)}
+                    className="w-8 h-8 accent-primary mt-1"
+                    aria-label={`Mark task ${task.name} as completed`}
+                  />
+                  <label
+                    htmlFor={`task-${task.id}`}
+                    className="flex-1 text-lg font-semibold leading-snug break-words"
                   >
-                    <div className="flex items-start gap-4">
-                      <input
-                        type="checkbox"
-                        id={`task-${task.id}`}
-                        checked={task.checked}
-                        onChange={(e) => handleCheck(task.id, e.target.checked)}
-                        className="w-8 h-8 accent-primary mt-1"
-                        aria-label={`Mark task ${task.name} as completed`}
-                      />
-                      <label
-                        htmlFor={`task-${task.id}`}
-                        className="flex-1 text-lg font-semibold leading-snug break-words"
-                      >
-                        {task.name}
-                      </label>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-3 text-base">
-                      <span
-                        className={`px-3 py-1 rounded-lg text-white font-medium ${
-                          task.status === "progress"
-                            ? "bg-blue-300"
-                            : task.status === "approved"
-                            ? "bg-green-300"
-                            : task.status === "review"
-                            ? "bg-yellow-300"
-                            : "bg-red-300"
-                        }`}
-                        aria-label={`Status: ${task.status}`}
-                      >
-                        {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
-                      </span>
-                      <span className="flex-1">
-                        Assigned: {usersList.find((u) => u.id === task.assignedto)?.username || "Unknown"}
-                      </span>
-                      <span className="text-gray-600">
-                        Due: {task.duedate || "None"}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                    {task.name}
+                  </label>
+                </div>
+                <div className="flex flex-wrap items-center gap-3 text-base">
+                  <span
+                    className={`px-3 py-1 rounded-lg text-white font-medium ${
+                      task.status === "progress"
+                        ? "bg-blue-300"
+                        : task.status === "approved"
+                        ? "bg-green-300"
+                        : task.status === "review"
+                        ? "bg-yellow-300"
+                        : "bg-red-300"
+                    }`}
+                    aria-label={`Status: ${task.status}`}
+                  >
+                    {task.status.charAt(0).toUpperCase() + task.status.slice(1)}
+                  </span>
+                  <span className="flex-1">
+                    Assigned:{" "}
+                    {usersList.find((u) => u.id === task.assignedto)?.username ||
+                      "Unknown"}
+                  </span>
+                  <span className="text-gray-600">
+                    Due: {task.duedate || "None"}
+                  </span>
+                </div>
               </div>
-            )}
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Modal for full description */}
+      {selectedTask && (
+        <div
+          className="fixed inset-0  bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={() => setSelectedTask(null)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-lg p-6 max-w-lg w-full relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-bold mb-4">Task : {selectedTask.name}</h3>
+            <p className="text-gray-700 text-base">Description : {selectedTask.description}</p>
+            <button
+              onClick={() => setSelectedTask(null)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
           </div>
         </div>
+      )}
+    </div>
       </div>
       <div className="w-full lg:w-1/3 p-8 bg-paper border-t lg:border-l lg:border-t-0">
         <div className="flex items-center mb-8">
@@ -635,10 +715,7 @@ function TaskManager({ user, logout }) {
         </div>
         <div className="space-y-6" aria-labelledby="schedule-heading">
           {schedules.map((s) => (
-            <div
-              key={s.id}
-              className="p-6 rounded-xl bg-paper shadow-md"
-            >
+            <div key={s.id} className="p-6 rounded-xl bg-paper shadow-md">
               <div className="mb-4">
                 <div className="text-gray-600 text-base">{s.time}</div>
                 <div className="text-xl font-semibold">{s.name}</div>
@@ -656,7 +733,9 @@ function TaskManager({ user, logout }) {
                       <span>{u.username}</span>
                     </div>
                   ) : (
-                    <div key={mId} className="text-gray-600">Unknown User</div>
+                    <div key={mId} className="text-gray-600">
+                      Unknown User
+                    </div>
                   );
                 })}
               </div>
@@ -676,7 +755,10 @@ function TaskManager({ user, logout }) {
               </h3>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="task-name" className="block text-lg mb-2 font-medium">
+                  <label
+                    htmlFor="task-name"
+                    className="block text-lg mb-2 font-medium"
+                  >
                     Task Name
                   </label>
                   <input
@@ -693,7 +775,29 @@ function TaskManager({ user, logout }) {
                   />
                 </div>
                 <div>
-                  <label htmlFor="task-status" className="block text-lg mb-2 font-medium">
+                  <label
+                    htmlFor="task-description"
+                    className="block text-lg mb-2 font-medium"
+                  >
+                    Description
+                  </label>
+                  <textarea
+                    id="task-description"
+                    value={newTask.description}
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, description: e.target.value })
+                    }
+                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                    placeholder="Enter task description"
+                    rows={3}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="task-status"
+                    className="block text-lg mb-2 font-medium"
+                  >
                     Status
                   </label>
                   <select
@@ -712,7 +816,10 @@ function TaskManager({ user, logout }) {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="assign-to" className="block text-lg mb-2 font-medium">
+                  <label
+                    htmlFor="assign-to"
+                    className="block text-lg mb-2 font-medium"
+                  >
                     Assign To
                   </label>
                   <select
@@ -737,7 +844,10 @@ function TaskManager({ user, logout }) {
                   </select>
                 </div>
                 <div>
-                  <label htmlFor="due-date" className="block text-lg mb-2 font-medium">
+                  <label
+                    htmlFor="due-date"
+                    className="block text-lg mb-2 font-medium"
+                  >
                     Due Date
                   </label>
                   <input
@@ -789,138 +899,178 @@ function TaskManager({ user, logout }) {
       )}
       {showScheduleModal && (
         <div
-    className="fixed inset-0 bg-gray-200 bg-opacity-30 flex items-center justify-center z-50 p-4"
-    onKeyDown={(e) => handleKeyDown(e, setShowScheduleModal)}
-  >
-    <div className="bg-paper p-6 sm:p-8 w-full sm:max-w-md md:max-w-lg rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto">
-      <form onSubmit={addSchedule}>
-        <h3 className="text-xl sm:text-2xl font-semibold mb-6" id="add-schedule-heading">
-          Add New Schedule
-        </h3>
-        <div className="space-y-4">
-          {/* Date */}
-          <div>
-            <label htmlFor="schedule-date" className="block text-base sm:text-lg mb-2 font-medium">
-              Date
-            </label>
-            <input
-              id="schedule-date"
-              type="date"
-              value={newSchedule.date}
-              onChange={(e) => setNewSchedule({ ...newSchedule, date: e.target.value })}
-              required
-              className="border border-gray-300 p-3 sm:p-4 w-full rounded-lg text-base sm:text-lg focus:outline-none focus:ring-4 focus:ring-primary"
-            />
-          </div>
+          className="fixed inset-0 bg-gray-200 bg-opacity-30 flex items-center justify-center z-50 p-4"
+          onKeyDown={(e) => handleKeyDown(e, setShowScheduleModal)}
+        >
+          <div className="bg-paper p-6 sm:p-8 w-full sm:max-w-md md:max-w-lg rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto">
+            <form onSubmit={addSchedule}>
+              <h3
+                className="text-xl sm:text-2xl font-semibold mb-6"
+                id="add-schedule-heading"
+              >
+                Add New Schedule
+              </h3>
+              <div className="space-y-4">
+                {/* Date */}
+                <div>
+                  <label
+                    htmlFor="schedule-date"
+                    className="block text-base sm:text-lg mb-2 font-medium"
+                  >
+                    Date
+                  </label>
+                  <input
+                    id="schedule-date"
+                    type="date"
+                    value={newSchedule.date}
+                    onChange={(e) =>
+                      setNewSchedule({ ...newSchedule, date: e.target.value })
+                    }
+                    required
+                    className="border border-gray-300 p-3 sm:p-4 w-full rounded-lg text-base sm:text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                  />
+                </div>
 
-          {/* Start Time */}
-          <div>
-            <label htmlFor="start-time" className="block text-base sm:text-lg mb-2 font-medium">
-              Start Time
-            </label>
-            <input
-              id="start-time"
-              type="time"
-              value={newSchedule.startTime}
-              onChange={(e) => setNewSchedule({ ...newSchedule, startTime: e.target.value })}
-              required
-              className="border border-gray-300 p-3 sm:p-4 w-full rounded-lg text-base sm:text-lg focus:outline-none focus:ring-4 focus:ring-primary"
-            />
-          </div>
+                {/* Start Time */}
+                <div>
+                  <label
+                    htmlFor="start-time"
+                    className="block text-base sm:text-lg mb-2 font-medium"
+                  >
+                    Start Time
+                  </label>
+                  <input
+                    id="start-time"
+                    type="time"
+                    value={newSchedule.startTime}
+                    onChange={(e) =>
+                      setNewSchedule({
+                        ...newSchedule,
+                        startTime: e.target.value,
+                      })
+                    }
+                    required
+                    className="border border-gray-300 p-3 sm:p-4 w-full rounded-lg text-base sm:text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                  />
+                </div>
 
-          {/* End Time */}
-          <div>
-            <label htmlFor="end-time" className="block text-base sm:text-lg mb-2 font-medium">
-              End Time
-            </label>
-            <input
-              id="end-time"
-              type="time"
-              value={newSchedule.endTime}
-              onChange={(e) => setNewSchedule({ ...newSchedule, endTime: e.target.value })}
-              required
-              className="border border-gray-300 p-3 sm:p-4 w-full rounded-lg text-base sm:text-lg focus:outline-none focus:ring-4 focus:ring-primary"
-            />
-          </div>
+                {/* End Time */}
+                <div>
+                  <label
+                    htmlFor="end-time"
+                    className="block text-base sm:text-lg mb-2 font-medium"
+                  >
+                    End Time
+                  </label>
+                  <input
+                    id="end-time"
+                    type="time"
+                    value={newSchedule.endTime}
+                    onChange={(e) =>
+                      setNewSchedule({
+                        ...newSchedule,
+                        endTime: e.target.value,
+                      })
+                    }
+                    required
+                    className="border border-gray-300 p-3 sm:p-4 w-full rounded-lg text-base sm:text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                  />
+                </div>
 
-          {/* Schedule Name */}
-          <div>
-            <label htmlFor="schedule-name" className="block text-base sm:text-lg mb-2 font-medium">
-              Schedule Name
-            </label>
-            <input
-              id="schedule-name"
-              type="text"
-              value={newSchedule.name}
-              onChange={(e) => setNewSchedule({ ...newSchedule, name: e.target.value })}
-              required
-              className="border border-gray-300 p-3 sm:p-4 w-full rounded-lg text-base sm:text-lg focus:outline-none focus:ring-4 focus:ring-primary"
-              placeholder="Enter schedule name"
-            />
-          </div>
+                {/* Schedule Name */}
+                <div>
+                  <label
+                    htmlFor="schedule-name"
+                    className="block text-base sm:text-lg mb-2 font-medium"
+                  >
+                    Schedule Name
+                  </label>
+                  <input
+                    id="schedule-name"
+                    type="text"
+                    value={newSchedule.name}
+                    onChange={(e) =>
+                      setNewSchedule({ ...newSchedule, name: e.target.value })
+                    }
+                    required
+                    className="border border-gray-300 p-3 sm:p-4 w-full rounded-lg text-base sm:text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                    placeholder="Enter schedule name"
+                  />
+                </div>
 
-          {/* Members */}
-          <div>
-            <label htmlFor="members" className="block text-base sm:text-lg mb-2 font-medium">
-              Members
-            </label>
-            <select
-              id="members"
-              multiple
-              value={newSchedule.members}
-              onChange={(e) =>
-                setNewSchedule({
-                  ...newSchedule,
-                  members: Array.from(e.target.selectedOptions, (opt) => opt.value),
-                })
-              }
-              className="border border-gray-300 p-3 sm:p-4 w-full rounded-lg text-base sm:text-lg focus:outline-none focus:ring-4 focus:ring-primary"
-            >
-              {usersList.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.username}
-                </option>
-              ))}
-            </select>
-          </div>
+                {/* Members */}
+                <div>
+                  <label
+                    htmlFor="members"
+                    className="block text-base sm:text-lg mb-2 font-medium"
+                  >
+                    Members
+                  </label>
+                  <select
+                    id="members"
+                    multiple
+                    value={newSchedule.members}
+                    onChange={(e) =>
+                      setNewSchedule({
+                        ...newSchedule,
+                        members: Array.from(
+                          e.target.selectedOptions,
+                          (opt) => opt.value
+                        ),
+                      })
+                    }
+                    className="border border-gray-300 p-3 sm:p-4 w-full rounded-lg text-base sm:text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                  >
+                    {usersList.map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {u.username}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-          {/* Color */}
-          <div>
-            <label htmlFor="schedule-color" className="block text-base sm:text-lg mb-2 font-medium">
-              Color
-            </label>
-            <select
-              id="schedule-color"
-              value={newSchedule.color}
-              onChange={(e) => setNewSchedule({ ...newSchedule, color: e.target.value })}
-              className="border border-gray-300 p-3 sm:p-4 w-full rounded-lg text-base sm:text-lg focus:outline-none focus:ring-4 focus:ring-primary"
-            >
-              <option value="yellow">Yellow</option>
-              <option value="blue">Blue</option>
-              <option value="green">Green</option>
-            </select>
-          </div>
+                {/* Color */}
+                <div>
+                  <label
+                    htmlFor="schedule-color"
+                    className="block text-base sm:text-lg mb-2 font-medium"
+                  >
+                    Color
+                  </label>
+                  <select
+                    id="schedule-color"
+                    value={newSchedule.color}
+                    onChange={(e) =>
+                      setNewSchedule({ ...newSchedule, color: e.target.value })
+                    }
+                    className="border border-gray-300 p-3 sm:p-4 w-full rounded-lg text-base sm:text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+                  >
+                    <option value="yellow">Yellow</option>
+                    <option value="blue">Blue</option>
+                    <option value="green">Green</option>
+                  </select>
+                </div>
 
-          {/* Buttons */}
-          <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-3 sm:space-y-0">
-            <button
-              type="submit"
-              className="bg-primary text-[var(--primary-text)] p-3 sm:p-4 rounded-lg text-base sm:text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary w-full sm:flex-1"
-            >
-              Add
-            </button>
-            <button
-              onClick={() => setShowScheduleModal(false)}
-              type="button"
-              className="bg-gray-200 text-gray-800 p-3 sm:p-4 rounded-lg text-base sm:text-lg font-semibold hover:bg-gray-300 focus:ring-4 focus:ring-primary w-full sm:flex-1"
-            >
-              Cancel
-            </button>
+                {/* Buttons */}
+                <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-3 sm:space-y-0">
+                  <button
+                    type="submit"
+                    className="bg-primary text-[var(--primary-text)] p-3 sm:p-4 rounded-lg text-base sm:text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary w-full sm:flex-1"
+                  >
+                    Add
+                  </button>
+                  <button
+                    onClick={() => setShowScheduleModal(false)}
+                    type="button"
+                    className="bg-gray-200 text-gray-800 p-3 sm:p-4 rounded-lg text-base sm:text-lg font-semibold hover:bg-gray-300 focus:ring-4 focus:ring-primary w-full sm:flex-1"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
-      </form>
-    </div>
-  </div>
       )}
     </div>
   );

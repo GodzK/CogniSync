@@ -123,7 +123,7 @@ app.get("/api/tasks", auth(), async (req, res) => {
 
 // Create task (manager only)
 app.post("/api/tasks", auth(["manager"]), async (req, res) => {
-  const { name, status, assignedto, isUpcoming, dueDate } = req.body;
+  const { name, description, status, assignedto, isUpcoming, dueDate } = req.body;
   if (!name || !status || !assignedto) return res.status(400).json({ error: "Invalid data" });
   const allowedStatuses = ['approved', 'progress', 'review', 'waiting'];
   if (!allowedStatuses.includes(status)) return res.status(400).json({ error: "Invalid status" });
@@ -139,6 +139,7 @@ app.post("/api/tasks", auth(["manager"]), async (req, res) => {
   const { error } = await supabase.from("tasks").insert([
     {
       name,
+      description,
       status,
       checked: false,
       assignedto: assignedto,
