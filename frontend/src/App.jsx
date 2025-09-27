@@ -626,7 +626,7 @@ function TaskManager({ user, logout }) {
           {user.role === "manager" && (
             <button
               onClick={() => setShowScheduleModal(true)}
-              className="ml-auto bg-primary text-[var(--primary-text)] p-4 rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary"
+              className="ml-auto bg-blue-200 text-[var(--primary-text)] p-4 rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary"
               aria-label="Add a new schedule"
             >
               Add Schedule
@@ -789,148 +789,138 @@ function TaskManager({ user, logout }) {
       )}
       {showScheduleModal && (
         <div
-          className="fixed inset-0 bg-gray-200 bg-opacity-30 flex items-center justify-center z-50 p-4"
-          onKeyDown={(e) => handleKeyDown(e, setShowScheduleModal)}
-        >
-          <div className="bg-paper p-8 w-full max-w-lg rounded-2xl shadow-lg">
-            <form onSubmit={addSchedule}>
-              <h3 className="text-2xl font-semibold mb-6" id="add-schedule-heading">
-                Add New Schedule
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="schedule-date" className="block text-lg mb-2 font-medium">
-                    Date
-                  </label>
-                  <input
-                    id="schedule-date"
-                    type="date"
-                    value={newSchedule.date}
-                    onChange={(e) =>
-                      setNewSchedule({ ...newSchedule, date: e.target.value })
-                    }
-                    required
-                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
-                    aria-required="true"
-                    aria-label="Select schedule date"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="start-time" className="block text-lg mb-2 font-medium">
-                    Start Time
-                  </label>
-                  <input
-                    id="start-time"
-                    type="time"
-                    value={newSchedule.startTime}
-                    onChange={(e) =>
-                      setNewSchedule({ ...newSchedule, startTime: e.target.value })
-                    }
-                    required
-                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
-                    aria-required="true"
-                    aria-label="Select start time"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="end-time" className="block text-lg mb-2 font-medium">
-                    End Time
-                  </label>
-                  <input
-                    id="end-time"
-                    type="time"
-                    value={newSchedule.endTime}
-                    onChange={(e) =>
-                      setNewSchedule({ ...newSchedule, endTime: e.target.value })
-                    }
-                    required
-                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
-                    aria-required="true"
-                    aria-label="Select end time"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="schedule-name" className="block text-lg mb-2 font-medium">
-                    Schedule Name
-                  </label>
-                  <input
-                    id="schedule-name"
-                    type="text"
-                    value={newSchedule.name}
-                    onChange={(e) =>
-                      setNewSchedule({ ...newSchedule, name: e.target.value })
-                    }
-                    required
-                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
-                    placeholder="Enter schedule name"
-                    aria-required="true"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="members" className="block text-lg mb-2 font-medium">
-                    Members
-                  </label>
-                  <select
-                    id="members"
-                    multiple
-                    value={newSchedule.members}
-                    onChange={(e) =>
-                      setNewSchedule({
-                        ...newSchedule,
-                        members: Array.from(
-                          e.target.selectedOptions,
-                          (option) => option.value
-                        ),
-                      })
-                    }
-                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
-                    aria-label="Select members for schedule"
-                  >
-                    {usersList.map((u) => (
-                      <option key={u.id} value={u.id}>
-                        {u.username}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="schedule-color" className="block text-lg mb-2 font-medium">
-                    Color
-                  </label>
-                  <select
-                    id="schedule-color"
-                    value={newSchedule.color}
-                    onChange={(e) =>
-                      setNewSchedule({ ...newSchedule, color: e.target.value })
-                    }
-                    className="border border-gray-300 p-4 w-full rounded-lg text-lg focus:outline-none focus:ring-4 focus:ring-primary"
-                    aria-label="Select schedule color"
-                  >
-                    <option value="yellow">Yellow</option>
-                    <option value="blue">Blue</option>
-                    <option value="green">Green</option>
-                  </select>
-                </div>
-                <div className="flex space-x-4">
-                  <button
-                    type="submit"
-                    className="bg-primary text-[var(--primary-text)] p-4 rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary flex-1"
-                    aria-label="Add schedule"
-                  >
-                    Add
-                  </button>
-                  <button
-                    onClick={() => setShowScheduleModal(false)}
-                    className="bg-gray-200 text-gray-800 p-4 rounded-lg text-lg font-semibold hover:bg-gray-300 focus:ring-4 focus:ring-primary flex-1"
-                    aria-label="Cancel adding schedule"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </form>
+    className="fixed inset-0 bg-gray-200 bg-opacity-30 flex items-center justify-center z-50 p-4"
+    onKeyDown={(e) => handleKeyDown(e, setShowScheduleModal)}
+  >
+    <div className="bg-paper p-6 sm:p-8 w-full sm:max-w-md md:max-w-lg rounded-2xl shadow-lg max-h-[90vh] overflow-y-auto">
+      <form onSubmit={addSchedule}>
+        <h3 className="text-xl sm:text-2xl font-semibold mb-6" id="add-schedule-heading">
+          Add New Schedule
+        </h3>
+        <div className="space-y-4">
+          {/* Date */}
+          <div>
+            <label htmlFor="schedule-date" className="block text-base sm:text-lg mb-2 font-medium">
+              Date
+            </label>
+            <input
+              id="schedule-date"
+              type="date"
+              value={newSchedule.date}
+              onChange={(e) => setNewSchedule({ ...newSchedule, date: e.target.value })}
+              required
+              className="border border-gray-300 p-3 sm:p-4 w-full rounded-lg text-base sm:text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+            />
+          </div>
+
+          {/* Start Time */}
+          <div>
+            <label htmlFor="start-time" className="block text-base sm:text-lg mb-2 font-medium">
+              Start Time
+            </label>
+            <input
+              id="start-time"
+              type="time"
+              value={newSchedule.startTime}
+              onChange={(e) => setNewSchedule({ ...newSchedule, startTime: e.target.value })}
+              required
+              className="border border-gray-300 p-3 sm:p-4 w-full rounded-lg text-base sm:text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+            />
+          </div>
+
+          {/* End Time */}
+          <div>
+            <label htmlFor="end-time" className="block text-base sm:text-lg mb-2 font-medium">
+              End Time
+            </label>
+            <input
+              id="end-time"
+              type="time"
+              value={newSchedule.endTime}
+              onChange={(e) => setNewSchedule({ ...newSchedule, endTime: e.target.value })}
+              required
+              className="border border-gray-300 p-3 sm:p-4 w-full rounded-lg text-base sm:text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+            />
+          </div>
+
+          {/* Schedule Name */}
+          <div>
+            <label htmlFor="schedule-name" className="block text-base sm:text-lg mb-2 font-medium">
+              Schedule Name
+            </label>
+            <input
+              id="schedule-name"
+              type="text"
+              value={newSchedule.name}
+              onChange={(e) => setNewSchedule({ ...newSchedule, name: e.target.value })}
+              required
+              className="border border-gray-300 p-3 sm:p-4 w-full rounded-lg text-base sm:text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+              placeholder="Enter schedule name"
+            />
+          </div>
+
+          {/* Members */}
+          <div>
+            <label htmlFor="members" className="block text-base sm:text-lg mb-2 font-medium">
+              Members
+            </label>
+            <select
+              id="members"
+              multiple
+              value={newSchedule.members}
+              onChange={(e) =>
+                setNewSchedule({
+                  ...newSchedule,
+                  members: Array.from(e.target.selectedOptions, (opt) => opt.value),
+                })
+              }
+              className="border border-gray-300 p-3 sm:p-4 w-full rounded-lg text-base sm:text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+            >
+              {usersList.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.username}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Color */}
+          <div>
+            <label htmlFor="schedule-color" className="block text-base sm:text-lg mb-2 font-medium">
+              Color
+            </label>
+            <select
+              id="schedule-color"
+              value={newSchedule.color}
+              onChange={(e) => setNewSchedule({ ...newSchedule, color: e.target.value })}
+              className="border border-gray-300 p-3 sm:p-4 w-full rounded-lg text-base sm:text-lg focus:outline-none focus:ring-4 focus:ring-primary"
+            >
+              <option value="yellow">Yellow</option>
+              <option value="blue">Blue</option>
+              <option value="green">Green</option>
+            </select>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-3 sm:space-y-0">
+            <button
+              type="submit"
+              className="bg-primary text-[var(--primary-text)] p-3 sm:p-4 rounded-lg text-base sm:text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary w-full sm:flex-1"
+            >
+              Add
+            </button>
+            <button
+              onClick={() => setShowScheduleModal(false)}
+              type="button"
+              className="bg-gray-200 text-gray-800 p-3 sm:p-4 rounded-lg text-base sm:text-lg font-semibold hover:bg-gray-300 focus:ring-4 focus:ring-primary w-full sm:flex-1"
+            >
+              Cancel
+            </button>
           </div>
         </div>
+      </form>
+    </div>
+  </div>
       )}
     </div>
   );
