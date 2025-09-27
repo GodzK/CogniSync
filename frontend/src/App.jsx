@@ -352,22 +352,30 @@ const closeModal = () => setSelectedTask(null);
   };
 
   const addTask = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("/tasks", newTask);
-      setShowTaskModal(false);
-      setNewTask({
-        name: "",
-        status: "progress",
-        assignedto: "",
-        isupcoming: false,
-        duedate: "",
-      });
-      fetchData();
-    } catch (err) {
-      alert(err.response?.data?.error || "Failed to add task");
-    }
-  };
+  e.preventDefault();
+  try {
+    await axios.post("/tasks", newTask);
+    setShowTaskModal(false);
+    setNewTask({
+      name: "",
+      description: "",
+      status: "progress",
+      assignedto: "",
+      isupcoming: false,
+      duedate: "",
+    });
+    fetchData();
+    swal({
+      title: "Add Success!",
+      text: "You added a new task!",
+      icon: "success",
+      button: "Aww yiss!",
+    });
+  } catch (err) {
+    alert(err.response?.data?.error || "Failed to add task");
+  }
+};
+
 
   const addSchedule = async (e) => {
     e.preventDefault();
@@ -384,7 +392,12 @@ const closeModal = () => setSelectedTask(null);
         color: "yellow",
       });
       fetchData();
-      alert("Schedule added successfully!");
+      swal({
+      title: "Add Success!",
+      text: "Schedule added successfully!",
+      icon: "success",
+      button: "Aww yiss!",
+    });
     } catch (err) {
       alert(err.response?.data?.error || "Failed to add schedule.");
     }
@@ -890,22 +903,14 @@ const closeModal = () => setSelectedTask(null);
                   </label>
                 </div>
                 <div className="flex space-x-4">
-                  <button
-                    type="submit"
-                    className="bg-primary text-[var(--primary-text)] p-4 rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary flex-1"
-                    aria-label="Add task"
-                    onClick={() => {
-                      swal({
-                        title: "Add Success!",
-                        text: "You add a new task!",
-                        icon: "success",
-                        button: "Aww yiss!",
-                      });
-                      setShowTaskModal(false);
-                    }}
-                  >
-                    Add
-                  </button>
+                 <button
+  type="submit"
+  className="bg-primary text-[var(--primary-text)] p-4 rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary flex-1"
+  aria-label="Add task"
+>
+  Add
+</button>
+
                   <button
                     onClick={() => setShowTaskModal(false)}
                     className="bg-gray-200 text-gray-800 p-4 rounded-lg text-lg font-semibold hover:bg-gray-300 focus:ring-4 focus:ring-primary flex-1"
