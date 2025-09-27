@@ -14,6 +14,9 @@ function App() {
   const [tel, setTel] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("user");
+useEffect(() => {
+  console.log("Current user:", user);
+}, [user]);
 
   useEffect(() => {
     if (token) {
@@ -333,7 +336,7 @@ swal({
     fetchData();
   }, [user]);
 
-  const fetchData = async () => {
+ const fetchData = async () => {
     try {
       // Fetch users first to ensure usersList is populated before tasks
       const usersRes = await axios.get("/users");
@@ -579,61 +582,23 @@ swal({
             Log Out
           </button>
         </div>
-        {user.role === "manager" && (
-          <><button
-            onClick={() => setShowTaskModal(true)}
-            className="bg-primary text-[var(--primary-text)] p-4 rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary mb-8 w-full sm:w-auto"
-            aria-label="Add a new task"
-          >
-            Add Task
-          </button>
-          <button
+       {user.role === "manager" && (
+          <div className="flex space-x-4 mb-8">
+            <button
+              onClick={() => setShowTaskModal(true)}
+              className="bg-primary text-[var(--primary-text)] p-4 rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary w-full sm:w-auto"
+              aria-label="Add a new task"
+            >
+              Add Task
+            </button>
+            <button
   onClick={() => setShowUsersModal(true)}
   className="bg-primary text-[var(--primary-text)] p-4 rounded-lg text-lg font-semibold hover:bg-opacity-90 focus:ring-4 focus:ring-primary w-full sm:w-auto"
   aria-label="View users"
 >
   View Users
 </button>
-          </>
-          
-          
-        )}
-        <div className="space-y-8">
-          <div>
-            <h2 className="text-2xl font-bold mb-4" id="current-tasks">
-              Current Tasks
-            </h2>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {currentTasks.filter(task => !task.checked).map((task) => (
-                <div
-                  key={task.id}
-                  className="bg-paper rounded-xl shadow-md p-6 flex flex-col gap-4"
-                >
-                  <div className="flex items-start gap-4">
-                    <input
-                      type="checkbox"
-                      id={`task-${task.id}`}
-                      checked={task.checked}
-                      onChange={(e) => handleCheck(task.id, e.target.checked)}
-                      className="w-8 h-8 accent-primary mt-1"
-                      aria-label={`Mark task ${task.name} as completed`}
-                    />
-                    <label
-                      htmlFor={`task-${task.id}`}
-                      className="flex-1 text-lg font-semibold leading-snug break-words"
-                    >
-                      {task.name} 
-                      <div className="text-gray-700 text-sm line-clamp-3">
-      {task.description}
-    </div>{task.description.length > 2 && (
-      <button
-        onClick={() => openModal(task)}
-        className="text-primary underline text-sm self-start"
-      >
-        ดูเพิ่มเติม
-      </button>
-    )}
-    {showUsersModal && (
+{showUsersModal && (
   <div
     className="fixed inset-0 bg-gray-200 bg-opacity-30 flex items-center justify-center z-50 p-4"
     onKeyDown={(e) => handleKeyDown(e, setShowUsersModal)}
@@ -666,12 +631,7 @@ swal({
                   <span className="font-semibold">Phone:</span> {u.tel}
                 </p>
                 <p>
-                  <span className="font-semibold">Role:</span>{" "}
-                  {u.role.charAt(0).toUpperCase() + u.role.slice(1)}
-                </p>
-                <p>
-                  <span className="font-semibold">คำเเนะนำ:</span>{" "}
-                  {u.rule}
+                  <span className="font-semibold">คำเเนะนำ:</span> {u.rule}
                 </p>
               </div>
             </div>
@@ -689,58 +649,101 @@ swal({
     </div>
   </div>
 )}
-                    </label>
-                   
+          </div>
+        )}
+        <div className="space-y-8">
+          <div>
+            <h2 className="text-2xl font-bold mb-4" id="current-tasks">
+              Current Tasks
+            </h2>
+            {currentTasks.length === 0 ? (
+              <div className="bg-paper rounded-xl shadow-md p-6 text-center text-gray-600 text-lg">
+                No Current Tasks Available
+              </div>
+            ) : (
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {currentTasks.filter((task) => !task.checked).map((task) => (
+                  <div
+                    key={task.id}
+                    className="bg-paper rounded-xl shadow-md p-6 flex flex-col gap-4"
+                  >
+                    <div className="flex items-start gap-4">
+                      <input
+                        type="checkbox"
+                        id={`task-${task.id}`}
+                        checked={task.checked}
+                        onChange={(e) => handleCheck(task.id, e.target.checked)}
+                        className="w-8 h-8 accent-primary mt-1"
+                        aria-label={`Mark task ${task.name} as completed`}
+                      />
+                      <label
+                        htmlFor={`task-${task.id}`}
+                        className="flex-1 text-lg font-semibold leading-snug break-words"
+                      >
+                        {task.name}
+                        <div className="text-gray-700 text-sm line-clamp-3">
+                          {task.description}
+                        </div>
+                        {task.description.length > 2 && (
+                          <button
+                            onClick={() => openModal(task)}
+                            className="text-primary underline text-sm self-start"
+                          >
+                            ดูเพิ่มเติม
+                          </button>
+                        )}
+                      </label>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3 text-base">
+                      <span
+                        className={`px-3 py-1 rounded-lg text-white font-medium ${
+                          task.status === "progress"
+                            ? "bg-blue-300"
+                            : task.status === "approved"
+                            ? "bg-green-300"
+                            : task.status === "review"
+                            ? "bg-yellow-300"
+                            : "bg-red-300"
+                        }`}
+                        aria-label={`Status: ${task.status}`}
+                      >
+                        {task.status.charAt(0).toUpperCase() +
+                          task.status.slice(1)}
+                      </span>
+                      <span className="flex-1">
+                        Assigned:{" "}
+                        {usersList.find((u) => u.id === task.assignedto)
+                          ?.username || "Unknown"}
+                      </span>
+                      <span className="text-gray-600">
+                        Due: {task.duedate || "None"}
+                      </span>
+                      {user.role === "user" && (
+                        <div className="bg-paper rounded-lg shadow p-4">
+                          <h2 className="text-lg font-semibold mb-2">แนบไฟล์</h2>
+                          <input
+                            type="file"
+                            onChange={(e) => setFile(e.target.files[0])}
+                            className="block w-full text-sm text-gray-700 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary p-1"
+                          />
+                          {file && (
+                            <p className="mt-1 text-gray-500 text-xs">
+                              ไฟล์ที่เลือก: {file.name}
+                            </p>
+                          )}
+                          <button
+                            onClick={handleFileSubmit}
+                            className="mt-2 px-3 py-1 text-sm bg-primary text-black rounded-md hover:bg-primary/90 transition"
+                          >
+                            ส่งไฟล์
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex flex-wrap items-center gap-3 text-base">
-                    <span
-                      className={`px-3 py-1 rounded-lg text-white font-medium ${
-                        task.status === "progress"
-                          ? "bg-blue-300"
-                          : task.status === "approved"
-                          ? "bg-green-300"
-                          : task.status === "review"
-                          ? "bg-yellow-300"
-                          : "bg-red-300"
-                      }`}
-                      aria-label={`Status: ${task.status}`}
-                    >
-                      {task.status.charAt(0).toUpperCase() +
-                        task.status.slice(1)}
-                    </span>
-                    <span className="flex-1">
-                      Assigned:{" "}
-                      {usersList.find((u) => u.id === task.assignedto)
-                        ?.username || "Unknown"}
-                    </span>
-                    <span className="text-gray-600">
-                      Due: {task.duedate || "None"}
-                    </span>
-                    {user.role === "user" && (
-  <div className="bg-paper rounded-lg shadow p-4">
-    <h2 className="text-lg font-semibold mb-2">แนบไฟล์</h2>
-    <input
-      type="file"
-      onChange={(e) => setFile(e.target.files[0])}
-      className="block w-full text-sm text-gray-700 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary p-1"
-    />
-    {file && (
-      <p className="mt-1 text-gray-500 text-xs">ไฟล์ที่เลือก: {file.name}</p>
-    )}
-    <button
-      onClick={handleFileSubmit}
-      className="mt-2 px-3 py-1 text-sm bg-primary text-black rounded-md hover:bg-primary/90 transition"
-    >
-      ส่งไฟล์
-    </button>
-  </div>
-)}
-
-                  </div>
-                </div>
-              ))}
-              
-            </div>
+                ))}
+              </div>
+            )}
           </div>
           <div>
             <h2 className="text-2xl font-bold mb-4" id="upcoming-tasks">
