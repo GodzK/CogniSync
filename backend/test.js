@@ -18,26 +18,20 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const auth = (roles = []) => {
   return async (req, res, next) => {
     const token = req.header("Authorization")?.replace("Bearer ", "");
-    if (!token) {
-      console.error("Auth error: No token provided");
-      return res.status(401).json({ error: "No token" });
-    }
+    if (!token) return res.status(401).json({ error: "No token" });
 
     try {
       const verified = jwt.verify(token, JWT_SECRET);
       if (roles.length && !roles.includes(verified.role)) {
-        console.error("Auth error: Role forbidden", verified.role);
         return res.status(403).json({ error: "Forbidden" });
       }
       req.user = verified;
       next();
-    } catch (err) {
-      console.error("Auth error: Invalid token", err);
+    } catch {
       res.status(400).json({ error: "Invalid token" });
     }
   };
 };
-
 
 // ---------------- Routes ----------------
 // Register
@@ -81,18 +75,17 @@ app.post("/api/register", async (req, res) => {
     password,
   });
   if (authError) {
-  console.error("Register error (Auth):", authError);
-  return res.status(500).json({ error: `Auth error: ${authError.message}` });
-}
+    return res.status(500).json({ error: `Auth error: ${authError.message}` });
+  }
 
   // Insert into public.users
   const { error } = await supabase.from("users").insert([
     { id: authUser.user.id, username, password: hashed, role, avatar, firstname, lastname, tel },
   ]);
   if (error) {
-  console.error("Register error (DB insert):", error);
-  return res.status(500).json({ error: `Database error: ${error.message}` });
-}
+    console.error("Supabase insert error:", error);
+    return res.status(500).json({ error: `Database error: ${error.message}` });
+  }
 
   res.json({ message: "Registered successfully" });
 });
@@ -100,28 +93,22 @@ app.post("/api/register", async (req, res) => {
 // Login
 app.post("/api/login", async (req, res) => {
   const { username, password } = req.body;
-  try {
-    const { data: user, error } = await supabase.from("users").select("*").eq("username", username).single();
+  const { data: user, error } = await supabase.from("users").select("*").eq("username", username).single();
 
-    if (error || !user) {
-      console.error("Login error: User not found", username);
-      return res.status(400).json({ error: "No user found" });
-    }
+  if (error || !user) return res.status(400).json({ error: "No user found" });
+  const valid = await bcrypt.compare(password, user.password);
+  if (!valid) return res.status(400).json({ error: "Invalid password" });
 
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) {
-      console.error("Login error: Invalid password for", username);
-      return res.status(400).json({ error: "Invalid password" });
-    }
-
-    const token = jwt.sign({ id: user.id, role: user.role, username: user.username }, JWT_SECRET);
-    res.json({ token, user: { id: user.id, username: user.username, role: user.role, avatar: user.avatar } });
-  } catch (err) {
-    console.error("Login error:", err);
-    res.status(500).json({ error: "Internal server error" });
-  }
+  const token = jwt.sign({ id: user.id, role: user.role, username: user.username }, JWT_SECRET); // Add username to token
+  res.json({ token, user: { id: user.id, username: user.username, role: user.role, avatar: user.avatar } });
 });
 
+// Get all users (manager only)  , auth(["manager"])
+app.get("/api/users", async (req, res) => {
+  const { data, error } = await supabase.from("users").select("id, username, avatar, role");
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
 
 // Get tasks
 app.get("/api/tasks", auth(), async (req, res) => {
@@ -130,11 +117,7 @@ app.get("/api/tasks", auth(), async (req, res) => {
     query = query.eq("assignedto", req.user.id);
   }
   const { data, error } = await query;
-  if (error) {
-  console.error("Create task error:", error);
-  return res.status(500).json({ error: error.message });
-}
-
+  if (error) return res.status(500).json({ error: error.message });
   res.json(data);
 });
 
